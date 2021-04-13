@@ -1,0 +1,163 @@
+/* Slider */
+
+.slick-slider 
+    position: relative
+    display: block
+    box-sizing: border-box
+    -webkit-touch-callout: none
+    -webkit-user-select: none
+    -khtml-user-select: none
+    -moz-user-select: none
+    -ms-user-select: none
+    user-select: none
+    -ms-touch-action: pan-y
+    touch-action: pan-y
+    -webkit-tap-highlight-color: transparent
+
+.slick-list 
+    position: relative
+    overflow: hidden
+    display: block
+    margin: 0
+    padding: 0
+
+    &:focus 
+        outline: none
+    
+
+    &.dragging 
+        cursor: pointer
+        cursor: hand
+    
+
+.slick-slider .slick-track,
+.slick-slider .slick-list 
+    -webkit-transform: translate3d(0, 0, 0)
+    -moz-transform: translate3d(0, 0, 0)
+    -ms-transform: translate3d(0, 0, 0)
+    -o-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+
+
+.slick-track 
+    position: relative
+    left: 0
+    top: 0
+    display: block
+    margin-left: auto
+    margin-right: auto
+
+    &:before,
+    &:after 
+        content: ""
+        display: table
+    
+
+    &:after 
+        clear: both
+    
+
+    .slick-loading & 
+        visibility: hidden
+    
+
+.slick-slide 
+    float: left
+    height: 100%
+    min-height: 1px
+    [dir="rtl"] & 
+        float: right
+    
+    img 
+        display: block
+    
+    &.slick-loading img 
+        display: none
+    
+
+    display: none
+
+    &.dragging img 
+        pointer-events: none
+    
+
+    .slick-initialized & 
+        display: block
+    
+
+    .slick-loading & 
+        visibility: hidden
+    
+
+    .slick-vertical & 
+        display: block
+        height: auto
+        border: 1px solid transparent
+    
+
+.slick-arrow.slick-hidden 
+    display: none
+
+
+.slick
+    &-custarr
+        width: 48px 
+        height: 48px
+        border-radius: 17px
+        background-color: $white4
+        position: absolute
+        top: -120px
+        border: none
+        padding: 0
+        cursor: pointer
+        opacity: 1
+        transition: 0.1s opacity
+        &:focus
+            outline: none
+        span
+            width: 24px
+            height: 24px
+            line-height: 24px
+            font-size: 24px
+            @include icomoonColor($blizzardBlue)
+            &:focus
+                border: none
+        &-close
+            top: -78px
+        &-middle
+            top: -96px
+        &-bottom
+            top: 394px
+        &-mini
+            top: -62px
+            width: 32px
+            height: 32px
+            border-radius: 11px
+            span
+                width: 16px
+                height: 16px
+                line-height: 16px
+                font-size: 16px
+    &-next
+        right: 62px
+        &.slick-custarr
+            &-bottom
+                right: 0
+            &-mini
+                right: 129px
+    &-prev
+        right: 134px
+        &.slick-custarr
+            &-bottom
+                right: 72px
+            &-mini
+                right: 169px
+    &-disabled
+        transition: 0.1s opacity
+        opacity: .5  
+        cursor: default  
+    &-slide
+        &:focus
+            outline: none
+        &>div:focus
+            outline: none
