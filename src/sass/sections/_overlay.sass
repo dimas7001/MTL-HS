@@ -1,0 +1,71 @@
+.overlay
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    padding-top: 18.5px
+    background-color: #fff
+    transition: .5s all
+    &_hidden
+        opacity: 0
+        transform: translateX(100%)
+        transition: .5s all
+    &__back
+        position: absolute
+        left: -97px
+        top: 1px
+        display: flex
+        flex-direction: column
+        justify-content: flex-start
+        align-items: center
+        cursor: pointer
+        +hoverOpacityTransi(.75)
+        img
+            width: 34px
+            height: auto
+            margin-bottom: 7px
+    &__top-wrapper
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: flex-end
+        margin-bottom: 15px
+        img
+            border-radius: 50%
+    &__titles
+        margin-left: 23px
+    &__type
+        color: $mainDark30
+        margin-top: -3px
+    &__carousel
+        border-radius: 3px
+        img
+            width: 620px
+            border-radius: 3px
+    &__share
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: center
+        margin-top: 13.5px
+        cursor: pointer
+        +hoverOpacityTransi(.75)
+        img
+            width: 22px
+            height: auto
+        span
+            color: $highlights
+            margin-left: 15.5px
+    &__text
+        margin: 32.5px 0 96px
+        &::after
+            content: ""
+            display: block
+            position: absolute
+            background-color: $mainDark20
+            height: 1px
+            width: calc(100% + 184px)
+            bottom: -46px 
+            left: 50%
+            transform: translateX(-50%)

@@ -1,0 +1,34 @@
+.header
+    height: 54.5px
+    border-bottom: 1px solid $mainDark10
+    padding-top: 8px
+    box-sizing: border-box
+    &__wrapper
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: flex-start
+    &__logo
+        height: 30px
+        width: 45px
+    nav
+        margin: 3px 0 0 62px
+    &__city
+        position: relative
+        text-transform: uppercase
+        text-decoration: none
+        color: $highlights
+        font-weight: 500
+        font-size: 16px
+        line-height: 24px
+        &_active
+            &::before
+                content: ""
+                display: block
+                position: absolute
+                background-color: $highlights
+                height: 2px
+                width: calc(100% - 25px)
+                bottom: -21px 
+                left: 50%
+                transform: translateX(-50%)

@@ -1,0 +1,38 @@
+@import 'vendor/normalize.min.css'
+
+@import 'libs/fonts'
+
+@import 'base/variables'
+@import 'base/mixins'
+
+@import 'libs/slick'
+
+*
+    font-family: 'Poppins', sans-serif
+
+html
+    scroll-behavior: smooth
+
+body
+    color: $mainDark
+    background-color: #fff
+    font-size: 16px
+    margin: 0
+
+main
+    position: relative
+    max-width: 100%
+    //overflow-x: hidden
+    //overflow-y: visible
+
+@import 'blocks/text'
+@import 'blocks/sort-by'
+@import 'blocks/container'
+@import 'blocks/boutik'
+@import 'blocks/tag'
+
+@import 'sections/header'
+@import 'sections/general'
+@import 'sections/overlay'
+
+//@import 'media' //needed to make page responsible, little edits
