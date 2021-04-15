@@ -1,22 +1,89 @@
 .sort-by
+    margin-right: 28px
+    position: relative
+    &:last-child
+        margin-right: 0        
     &__wrapper
         display: flex
         flex-direction: row
         justify-content: flex-start
         align-items: flex-start
-    &__item
+        &-mobile
+            display: none
+    &__title
         display: inline-block
         padding: 11px 25px 9px 24px
         border: 1px solid $highlights
         border-radius: 50px
         box-sizing: border-box
         color: $highlights
-        margin-right: 28px
         cursor: pointer
         transition: .2s all
         &:hover
             color: #fff
             background-color: $highlights
             transition: .2s all
-        &:last-child
-            margin-right: 0
+        &_active
+            color: #fff
+            background-color: $highlights
+            transition: .2s all
+    &__dropdown
+        width: 400px
+        box-sizing: border-box
+        position: absolute
+        top: 55px
+        left: 0
+        padding-top: 30px
+        background-color: #fff
+        border-radius: 15px
+        border: 1px solid $highlights70
+        z-index: 10
+        transition: .3s all
+        display: none
+        &_inactive
+            opacity: 0
+            transform: scaleY(1)
+            transition: .3s all
+    &__list
+        border-bottom: 1px solid $highlights40
+    &__item
+        margin: 0 20px 25px 
+        padding-left: 40px
+        input
+            position: absolute
+            z-index: -1
+            opacity: 0
+            &:checked+label::before
+                background-image: url('../icons/check.svg')
+                background-color: $highlights
+                border-color: transparent
+                transition: .1s all
+        label
+            position: relative
+            cursor: pointer
+            &::before
+                position: absolute
+                top: 22px
+                transform: translateY(-50%)
+                left: -35px
+                content: ""
+                width: 24px
+                height: 24px
+                display: block
+                border: 1px solid $highlights
+                border-radius: 4px
+                box-sizing: border-box
+                background-color: transparent
+                background-image: none
+                background-position: center center
+                background-size: 100% 80%
+                background-repeat: no-repeat
+                transition: .1s all
+    &__controls
+        height: 65px
+        display: flex
+        flex-direction: row
+        justify-content: space-between
+        align-items: center
+        padding: 0 15px
+        box-sizing: border-box

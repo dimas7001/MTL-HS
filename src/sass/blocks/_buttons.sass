@@ -1,0 +1,28 @@
+button
+    font-weight: 500
+    font-size: 14px
+    line-height: 21px
+    text-align: center
+    vertical-align: middle
+    border: none
+    &:focus
+        outline: none
+    &.btn
+        background-color: $highlights
+        height: 35px
+        width: 60px
+        color: #fff
+        border: 1px solid $highlights
+        border-radius: 8px
+        +hoverColorTransi($highlights, #fff)
+        &_inactive
+            cursor: default
+            opacity: .5
+            &:not(.btn-bare):hover
+                background-color: $highlights
+                color: #fff
+        &-bare
+            background-color: transparent
+            text-decoration: underline
+            &:hover
+                

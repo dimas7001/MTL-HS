@@ -7,9 +7,10 @@
     padding-top: 18.5px
     background-color: #fff
     transition: .5s all
+    z-index: 100
     &_hidden
         opacity: 0
-        transform: translateX(100%)
+        left: 100%
         transition: .5s all
     &__back
         position: absolute
@@ -39,6 +40,7 @@
         color: $mainDark30
         margin-top: -3px
     &__carousel
+        position: relative
         border-radius: 3px
         img
             width: 620px

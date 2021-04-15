@@ -1,0 +1,25 @@
+.hamburger
+    display: none
+    position: relative
+    width: 25px
+    height: 3px
+    background-color: $highlights
+    margin-top: 12px
+    &::after
+        position: absolute
+        bottom: 8px
+        left: 0
+        content: ''
+        display: block
+        width: 25px
+        height: 3px
+        background-color: $highlights
+    &::before
+        position: absolute
+        top: 8px
+        left: 0
+        content: ''
+        display: block
+        width: 25px
+        height: 3px
+        background-color: $highlights
