@@ -108,14 +108,15 @@ $('.sort-by__wrapper:not(.sort-by__wrapper-mobile) .sort-by__title').on('click',
     if ($(this).is($('.sort-by__title_active'))) {  //if this dropdown already opened -> close it
         $(this).removeClass('sort-by__title_active');
         $(this).siblings('.sort-by__dropdown').addClass('sort-by__dropdown_inactive');
-        var bufferSortBy = $(this).siblings('.sort-by__dropdown');
         setTimeout(function() {
-            bufferSortBy.attr('style', 'display: none !important');
+            $(this).siblings('.sort-by__dropdown').attr('style', 'display: none !important');
         }, 300);
         dropdownActiveFlag = 0;
     } else {    //this dropdown was closed -> open it
         $('.sort-by__title_active').removeClass('sort-by__title_active');
-        $('.sort-by__dropdown').addClass('sort-by__dropdown_inactive');
+        var element = $('.sort-by__dropdown:not(.sort-by__dropdown_inactive)');
+        element.addClass('sort-by__dropdown_inactive');
+        element.attr('style', 'display: none !important');
         $(this).addClass('sort-by__title_active');
         $(this).siblings('.sort-by__dropdown').css('display', 'block');
         $(this).siblings('.sort-by__dropdown').removeClass('sort-by__dropdown_inactive');
