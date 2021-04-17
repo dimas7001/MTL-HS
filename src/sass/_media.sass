@@ -5,45 +5,14 @@
     .general__fixed
         width: 30vw
         right: 40px   
-@media (min-width: 1440px)
-    .container-m
-        margin: 0 0 0 5vw
-@media (min-width: 1515px)
-    .container-m
-        margin: 0 0 0 10vw
+
 @media (min-width: 1615px)
     .container-s
         margin: 0 auto
     .general__fixed
         right: 5vw
-@media (min-width: 1700px)
-    .container-m
-        margin: 0 0 0 15vw
-    .general__fixed
-        right: 5vw
-@media (min-width: 1710px)
-    .general__fixed
-        right: 9vw
-@media (min-width: 1990px)
-    .general__fixed
-        right: 13vw
-@media (min-width: 2000px)
-    .container-m
-        margin: 0 0 0 20vw
-@media (min-width: 2190px)
-    .container-m
-        margin: 0 0 0 23vw
-    .general__fixed
-        right: 15vw
-@media (min-width: 2450px)
-    .container-m
-        margin: 0 0 0 26vw
-    .general__fixed
-        right: 19vw
-@media (min-width: 2560px)
-    .general__fixed
         right: auto
-        left: calc(50% + 150px)
+        left: 1000px       
 
 @media (max-width: 1200px)
     .container-s
@@ -51,12 +20,11 @@
 @media (max-width: 1050px)
     .container-s
         margin: 0 20vw 0 20vw
-@media (max-width: 1000px)
+@media (max-width: 1024px)
     .container-m
-        width: 60vw
+        width: 754px
     .general__fixed
-        width: 25vw
-        right: 30px
+        display: none
 @media (max-width: 950px)
     .container-s
         margin: 0 15vw 0 181px
@@ -66,17 +34,11 @@
         &__text::after
             width: calc(100% + 130px)
 @media (max-width: 930px)
-    .container-m
-        width: 65vw
-    .general__fixed
-        width: 20vw
-        right: 25px
     .overlay
         &__text::after
             width: calc(100% + 80px)
 @media (max-width: 880px)
     .container
-        margin-left: 7vw
         &-s
             width: 70vw
             margin-left: calc(7vw + 107px)
@@ -88,14 +50,13 @@
         &__text::after
             width: calc(100% + 50px)
 @media (max-width: 850px)
-    .container-m
-        width: 66vw
-    .general__fixed
-        width: 19vw
-        right: 15px
+    .container
+        margin-left: 40px
+        &-m
+            width: calc(100% - 70px)
+            margin: 0 30px 0 40px
 @media (max-width: 830px)
     .container
-        margin-left: 7vw
         &-s
             width: 65vw
     .overlay
@@ -118,11 +79,6 @@
         &-s
             width: 462px
             margin: 0 20.68vw 0 19.12vw
-        &-m
-            width: calc(100% - 70px)
-            margin: 0 30px 0 40px
-    .general__fixed
-        display: none
     .boutik
         padding-bottom: 66px
         &__wrapper

@@ -36,16 +36,16 @@ $(document).ready(function(){
     });
 });
 
-$('.boutik__info').on('click', function() { //read an info fron boutik dataset, parse it to an overlay and show the overlay
+$('.boutik__info, .boutik__img img').on('click', function() { //read an info fron boutik dataset, parse it to an overlay and show the overlay
     $('.overlay__carousel').text('');
-    var photos =  $(this).parent().data('photo').split(', ');
+    var photos =  $(this).parents('.boutik').data('photo').split(', ');
     for (var i = 0; i < photos.length; i++)
         $('.overlay__carousel')[0].insertAdjacentHTML('beforeend', '<img src="' + photos[i] + '" alt="haircut_photo">');
 
-    $('.overlay__name').text($(this).parent().data('name'));
-    $('.overlay__type').text($(this).parent().data('subtitle'));
+    $('.overlay__name').text($(this).parents('.boutik').data('name'));
+    $('.overlay__type').text($(this).parents('.boutik').data('subtitle'));
     $('.overlay__text').text('');
-    $('.overlay__text')[0].insertAdjacentHTML('beforeend', $(this).parent().data('text'));
+    $('.overlay__text')[0].insertAdjacentHTML('beforeend', $(this).parents('.boutik').data('text'));
     setTimeout(function() {
         $('.header').toggleClass('header_hidden');
         $('.overlay').toggleClass('overlay_hidden');
