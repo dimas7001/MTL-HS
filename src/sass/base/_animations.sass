@@ -1,0 +1,21 @@
+@keyframes carette-down
+    0%
+        transform: translateY(0)
+    50%
+        transform: translateY(3px)
+    100%
+        transform: rotate(0)
+
+@keyframes carette-up
+    0%
+        transform: translateY(0)
+    50%
+        transform: translateY(-3px)
+    100%
+        transform: rotate(0)
+
+.carette
+    &-down-anim
+        animation: .3s ease-in 0s 1 normal none running carette-down
+    &-up-anim
+        animation: .3s ease-in 0s 1 normal none running carette-up

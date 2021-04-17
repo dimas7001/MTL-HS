@@ -23,3 +23,104 @@
         width: 25px
         height: 3px
         background-color: $highlights
+    &__wrapper
+        position: fixed
+        top: 0
+        left: 0
+        width: 100%
+        height: 100%
+        transition: .4s all
+        &_inactive
+            transform: translateX(-100%)
+            transition: .4s all
+            .hamburger__shadow
+                opacity: 0
+                transition: .4s all
+    &__shadow
+        background-color: $mainDark70
+        width: 100%
+        height: 100%
+        transition: .4s all
+    &__menu
+        position: absolute
+        top: 0
+        left: 0
+        width: calc(100% - 50px)
+        height: calc(100% - 12px)
+        background-color: #fff
+    &__header
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: center
+        box-sizing: border-box
+        height: 60px
+        border-bottom: 1px solid $mainDark10
+        padding-left: 12px
+    &__close
+        height: 30px
+        width: 30px
+    &__top-logo
+        width: 40px
+        height: auto
+        margin-left: 24.8vw
+    &__main
+        padding-top: 28px
+    &__locations
+        padding: 0 26px 0 21px
+    &__dropdown-title
+        display: flex
+        flex-direction: row
+        justify-content: space-between
+        align-items: center
+        background-color: #fff
+        h2
+            font-size: 20px
+            line-height: 30px
+        img
+    &__dropdown-list
+        position: relative
+        margin: 15px 0 0
+        padding: 0
+        list-style: none
+        top: 0px
+        transition: .2s all
+        li
+            height: 100px
+            padding: 22px 0 0 36px
+            margin: 0
+            border-left: 1px solid transparent
+            font-size: 16px
+            line-height: 24px
+            box-sizing: border-box
+            text-transform: uppercase
+            &.active
+                border-left-color: $mainDark10
+        &_closed
+            top: -10vh
+            transform: scaleY(0)
+            transition: .2s all
+    &__footer
+        width: 100%
+        position: absolute
+        bottom: 0
+        left: 0
+        display: flex
+        flex-direction: row
+        justify-content: space-between
+        align-items: flex-start
+        box-sizing: border-box
+        height: 69px
+        border-top: 1px solid $mainDark10
+        padding: 12px 13px 0 16px
+        img
+            margin-left: 0
+            margin-right: 13px
+        a
+            text-decoration: none
+            color: $mainDark60
+            font-size: 12px
+            line-height: 18px
+    &__bottom-logo
+        width: 40px
+        height: auto
