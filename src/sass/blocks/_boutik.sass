@@ -1,11 +1,12 @@
 .boutik
     position: relative
-    padding: 15.5px 10px 60px 0
+    padding: 15.5px 10px 49px 0
     display: flex
     flex-direction: row
     align-items: flex-start
     justify-content: flex-start
     cursor: pointer
+    margin-left: 1px
     &::before
         position: absolute
         content: ""
@@ -19,12 +20,18 @@
         margin-top: 30.5px
         &>div .boutik:last-child
             padding-bottom: 0
+            margin-bottom: 20px
     &__img
         height: 182px
         width: 182px
         border-radius: 3px
         img
             border-radius: 3px
+        .slick-custarr
+            opacity: 0
+        &:hover
+            .slick-custarr
+                opacity: 1
     &__info
         margin-left: 27px
     &__top-wrapper

@@ -1,25 +1,102 @@
 
 @media (max-width: 1440px)
     .container-m
-        width: 55vw
+        width: calc(63.75vw - 170px)
     .general__fixed
-        width: 30vw
-        right: 40px   
+        width: 36.25vw
 
+@media (min-width: 1440px)
+    .container
+        margin: 0 0 0 5vw
+        &-m
+            margin: 0 0 0 5vw
+    .general__fixed
+        width: calc(95vw - 840px)
+@media (min-width: 1515px)
+    .container
+        width: calc(100% - 10vw)
+        margin: 0 0 0 10vw
+        &-m
+            margin: 0 0 0 10vw
+    .general__fixed
+        width: calc(90vw - 840px)
 @media (min-width: 1615px)
     .container-s
         margin: 0 auto
+@media (min-width: 1700px)
+    .container
+        width: calc(100% - 15vw)
+        margin: 0 0 0 15vw
+        &-m
+            margin: 0 0 0 15vw
     .general__fixed
-        right: 5vw
-        right: auto
-        left: 1000px       
+        width: calc(85vw - 840px)
+@media (min-width: 1988px)
+    .general__fixed
+        width: 850px
+        right: calc(85vw - 1628px)
+@media (min-width: 2000px)
+    .container
+        width: calc(100% - 20vw)
+        margin: 0 0 0 20vw
+        &-m
+            margin: 0 0 0 20vw
+    .general__fixed
+        width: calc(80vw - 840px)
+        right: 62px
+@media (min-width: 2112px)
+    .general__fixed
+        width: 850px
+        right: calc(80vw - 1628px)
+@media (min-width: 2190px)
+    .container
+        width: calc(100% - 23vw)
+        margin: 0 0 0 23vw
+        &-m
+            margin: 0 0 0 23vw
+    .general__fixed
+        width: calc(77vw - 840px)
+        right: 62px
+@media (min-width: 2195px)
+    .general__fixed
+        width: 850px
+        right: calc(77vw - 1628px)
+@media (min-width: 2450px)
+    .container
+        width: calc(100% - 26vw)
+        margin: 0 0 0 26vw
+        &-m
+            margin: 0 0 0 26vw
+    .general__fixed
+        right: calc(74vw - 1628px)           
 
-@media (max-width: 1200px)
+
+@media (max-width: 1250px)
     .container-s
         margin: 0 20vw 0 25vw
+@media (max-width: 1159px)
+    .container-m
+        width: calc(100vw - 580px)
+    .general__fixed
+        width: 420px
+@media (max-width: 1110px)
+    .container-m
+        width: calc(100vw - 560px)
+    .general__fixed
+        right: 35px
+@media (max-width: 1080px)
+    .container-m
+        width: calc(100vw - 570px)
+    .general__fixed
+        right: 30px
 @media (max-width: 1050px)
-    .container-s
-        margin: 0 20vw 0 20vw
+    .container
+        &-s
+            margin: 0 20vw 0 20vw
+        &-m
+            width: calc(100vw - 555px)
+    .general__fixed
+        right: 15px
 @media (max-width: 1024px)
     .container-m
         width: 754px
@@ -80,7 +157,7 @@
             width: 462px
             margin: 0 20.68vw 0 19.12vw
     .boutik
-        padding-bottom: 66px
+        padding-bottom: 55px
         &__wrapper
             &>div .boutik:last-child
                 padding-bottom: 66px
@@ -129,11 +206,13 @@
     .sort-by
         position: static
         &__wrapper
-            position: relative
+            display: none
+            &-mobile
+                display: block
         &__dropdown
             left: 50%
             transform: translate(-50%)
-            width: 50vw
+            width: 50vw        
 @media (max-width: 748px)
     .overlay
         &__back
@@ -176,6 +255,9 @@
                 width: 30vw
         &__info
             margin-left: 15px
+    .sort-by
+        &__dropdown
+            width: 300px
 @media (max-width: 490px)
     .container
         width: calc(100% - 25px)
@@ -214,8 +296,6 @@
             margin-left: 40px
         nav
             display: none
-    .hamburger
-        display: block
     .general
         padding-top: 13px
         padding-bottom: 62px
@@ -226,8 +306,9 @@
     .boutik
         bottom: 22px
         padding-top: 13px
-        padding-bottom: 42px
+        padding-bottom: 31px
         padding-right: 0
+        //margin-left: 1px
         &::before
             width: 100%
         &__img
@@ -246,6 +327,7 @@
             margin-left: 0
         &__wrapper
             margin-top: 0
+            //padding-left: -1px
             &>div .boutik
                 &:last-child
                     padding-bottom: 42px
@@ -278,10 +360,6 @@
             &.slick-custarr
                 &-general
                     left: 20%
-    .sort-by__wrapper
-        display: none
-        &-mobile
-            display: block
     .overlay
         position: fixed
         top: 0
@@ -323,3 +401,5 @@
             margin: 25px 0 30px
             font-size: 15px
             line-height: 22px
+    .hamburger
+        display: block    
