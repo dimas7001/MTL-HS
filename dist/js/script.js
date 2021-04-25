@@ -1,7 +1,22 @@
 var positions = [];
 var onePagePositions = [];
+var mobileFlag = 0;
+var mobile470Flag = 0;
+var offsetDelta = 0;
+var popupBottomDelta = 0;
 
 $(document).ready(function(){
+    
+    if ($(document).width() <= 1007)
+        mobileFlag = 1;
+    if ($(document).width() <= 470)
+        mobile470Flag = 1;
+    if ($(document).width() <= 1024) {
+        offsetDelta = 43;
+        popupBottomDelta = 22;
+    }
+        
+
     var hairstylistsLen = hairstylists.length;
     var pagesAmount = Math.trunc(hairstylistsLen / itemsPerPage) + 1;
     
@@ -301,10 +316,32 @@ $(document).ready(function(){
 
     $('.boutik__wrapper').on('beforeChange', function(event, slick, currentSlide, nextSlide){
         $('.pagination').slick('slickGoTo', nextSlide);
-        for (var i = currentSlide * itemsPerPage; i < ((markers.length - currentSlide * itemsPerPage >= itemsPerPage) ? ((currentSlide + 1) * itemsPerPage) : markers.length); i++)
-            markers[i].setMap(null);
-        for (var i = nextSlide * itemsPerPage; i < ((markers.length - nextSlide * itemsPerPage >= itemsPerPage) ? ((nextSlide + 1) * itemsPerPage) : markers.length); i++)
-            markers[i].setMap(map);
+        if (!mobileFlag) {
+            for (var i = currentSlide * itemsPerPage; i < ((markers.length - currentSlide * itemsPerPage >= itemsPerPage) ? ((currentSlide + 1) * itemsPerPage) : markers.length); i++)
+                markers[i].setMap(null);
+            for (var i = nextSlide * itemsPerPage; i < ((markers.length - nextSlide * itemsPerPage >= itemsPerPage) ? ((nextSlide + 1) * itemsPerPage) : markers.length); i++)
+                markers[i].setMap(map);
+        }
+    });
+
+    /*$('.toggle__button:not(.toggle__button.toggle__button_active)').on('click', function() {
+        $('.toggle__button_active').toggleClass('toggle__button_active');
+        $(this).toggleClass('toggle__button_active');
+    });*/
+
+    
+    $('.general__fixed-close, .toggle__map').on('click', function() {
+        $('body').attr('style', function(index, attr){
+            return attr == 'overflow: hidden;' ? 'overflow: visible;' : 'overflow: hidden;';
+        });
+        $('.general__fixed').toggleClass('general__fixed_inactive');
+    });
+
+    $('.general__fixed-popup-close').on('click', function() {
+        $('.general__fixed-popup').addClass('general__fixed-popup_hidden');
+        setTimeout(function() {
+            $('.general__fixed-popup').css('display', 'none');
+        }, 300);
     });
 
 });
@@ -312,69 +349,131 @@ $(document).ready(function(){
 var map;
 var markers = [];
 var markerOpened;
+var markerOpenedZ;
 function initMap() {
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 45.535208, lng: -73.663268},
-        zoom: 10,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false,
-    });  
+    setTimeout(function() {
+        
     
-    var counter = 0;
-    for (var i = 0; i < positions.length; i++)
-        for (var j = 0; j < positions[i].length; j++) {
-            markers[counter] = new google.maps.Marker({
-                position: { lat: positions[i][j].lat, lng: positions[i][j].lng},
-                icon: 'icons/marker.png',
-                zIndex: 1,
-                noClear: true,
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 45.535208, lng: -73.663268},
+            zoom: 10,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+        });  
+        
+        var counter = 0;
+        for (var i = 0; i < positions.length; i++)
+            for (var j = 0; j < positions[i].length; j++) {
+                var image = {
+                    url: "icons/marker.png",
+                    size: new google.maps.Size(22, 22)
+                };
+                markers[counter] = new google.maps.Marker({
+                    position: { lat: positions[i][j].lat, lng: positions[i][j].lng},
+                    icon: image,
+                    zIndex: counter,
+                    noClear: true,
+                });
+                counter++;
+            }
+
+        var to = itemsPerPage;
+        if (mobileFlag)
+            to = markers.length;
+            
+        for (var i = 0; i < to; i++)
+            markers[i].setMap(map);
+
+        for (var i = 0; i < markers.length; i++) {
+            google.maps.event.addListener(markers[i], 'click', function() {
+                if (markerOpened) {
+                    markerOpened.setIcon('icons/marker.png');
+                    markerOpened.setZIndex(markerOpenedZ);
+                }
+                this.setIcon('icons/marker-a.png');
+                markerOpenedZ = this.getZIndex();
+                this.setZIndex(1000);
+                markerOpened = this;
+
+                var base = hairstylists[markerOpenedZ];
+                $('.general__fixed-popup img').attr('src', base.imagesGeneral[0]);
+                $('.general__fixed-popup-name').text(base.businessName);
+                $('.general__fixed-popup-desc').text(base.description.substr(0, 79) + '...');
+                $('.general__fixed-popup .tag__wrapper').text("");
+                for (var j = 0; j < base.categories.length; j++)
+                    $('.general__fixed-popup .tag__wrapper')[0].insertAdjacentHTML('afterbegin', `<div class="tag">${base.categories[j]}</div>`);
+                $('.general__fixed-popup').css('display', 'flex');
+                setTimeout(function() {
+                    $('.general__fixed-popup').removeClass('general__fixed-popup_hidden');
+                }, 10);
+                if (!mobile470Flag) {
+                    var positionPX = fromLatLngToPoint(markerOpened.position, map);
+                    var top = positionPX.y + 6;
+                    var left = positionPX.x;
+                    $('.general__fixed-popup').css({'top': top, 'left': left, 'transform': 'translateX(-50%)', 'bottom': 'auto'});
+                    if ($('.general__fixed-popup').width() / 2 > positionPX.x - 15) 
+                        $('.general__fixed-popup').css({'left': 15 + offsetDelta, 'transform': 'none'});
+                    if ($('.general__fixed-popup').width() / 2 > $('#map').width() - positionPX.x - 15)
+                        $('.general__fixed-popup').css({'left': 'auto', 'right': 15 + offsetDelta, 'transform': 'none'});
+                    if ($('.general__fixed-popup').height() + 6 > $('#map').height() - positionPX.y - 4)
+                        $('.general__fixed-popup').css({'top': 'auto', 'bottom': $('#map').height() - positionPX.y + 28 + popupBottomDelta});
+                }   
             });
-            counter++;
         }
 
-    for (var i = 0; i < itemsPerPage; i++)
-        markers[i].setMap(map);
-
-    for (var i = 0; i < markers.length; i++) {
-        google.maps.event.addListener(markers[i], 'click', function() {
+        google.maps.event.addListener(map, 'click', function() {
             if (markerOpened) {
                 markerOpened.setIcon('icons/marker.png');
-                markerOpened.setZIndex(1);
+                markerOpened.setZIndex(markerOpenedZ);
+                markerOpened = 0;
+                markerOpenedZ = 0;
             }
-            this.setIcon('icons/marker-a.png');
-            this.setZIndex(10);
-            markerOpened = this;
+            $('.general__fixed-popup').addClass('general__fixed-popup_hidden');
+            setTimeout(function() {
+                $('.general__fixed-popup').css('display', 'none');
+            }, 300);
+    });
 
+        map.addListener("center_changed", () => {
+            if ($('.general__fixed-popup_hidden').length == 0) {
+                $('.general__fixed-popup').addClass('general__fixed-popup_hidden');
+                setTimeout(function() {
+                    $('.general__fixed-popup').css('display', 'none');
+                }, 300);
+            }
         });
-    }
 
-    google.maps.event.addListener(map, 'click', function() {
-        if (markerOpened) {
-            markerOpened.setIcon('icons/marker.png');
-            markerOpened.setZIndex(1);
-            markerOpened = 0;
-        }
-   });
+        $('.boutik').on('hover', function() {
+            if (markerOpened) {
+                markerOpened.setIcon('icons/marker.png');
+                markerOpened.setZIndex(markerOpenedZ);
+            }
+            markerOpened = markers[$(this).data('id') - 1];
+            markerOpenedZ = markerOpened.getZIndex();
+            markerOpened.setIcon('icons/marker-a.png');
+            markerOpened.setZIndex(1000);
+        });
 
-    $('.boutik').on('hover', function() {
-        if (markerOpened) {
-            markerOpened.setIcon('icons/marker.png');
-            markerOpened.setZIndex(1);
-        }
-        markerOpened = markers[$(this).data('id') - 1];
-        markerOpened.setIcon('icons/marker-a.png');
-        markerOpened.setZIndex(10);
-    });
+        $('.boutik').on('mouseleave', function() {
+            if (markerOpened) {
+                markerOpened.setIcon('icons/marker.png');
+                markerOpened.setZIndex(markerOpenedZ);
+                markerOpened = 0;
+                markerOpenedZ = 0;
+            }
+        });
 
-    $('.boutik').on('mouseleave', function() {
-        if (markerOpened) {
-            markerOpened.setIcon('icons/marker.png');
-            markerOpened.setZIndex(1);
-            markerOpened = 0;
-        }
-    });
+    }, 100);
 };
+
+function fromLatLngToPoint(latLng, map) {
+    var topRight = map.getProjection().fromLatLngToPoint(map.getBounds().getNorthEast());
+    var bottomLeft = map.getProjection().fromLatLngToPoint(map.getBounds().getSouthWest());
+    var scale = Math.pow(2, map.getZoom());
+    var worldPoint = map.getProjection().fromLatLngToPoint(latLng);
+    return new google.maps.Point((worldPoint.x - bottomLeft.x) * scale, (worldPoint.y - topRight.y) * scale);
+}
 
 
 

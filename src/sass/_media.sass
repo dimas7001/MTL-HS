@@ -70,7 +70,26 @@
     .general__fixed
         right: calc(74vw - 1628px)           
 
-
+@media (max-width: 1290px)
+    .general__fixed-popup
+        width: 390px
+        min-height: 130px
+        img
+            width: 130px
+            height: 130px
+        &-info
+            padding: 9px 0 0 5px
+        &-name
+            margin-left: 10px
+        &-desc
+            margin: 8px 0 15px 3px
+        &-close
+            top: 12px
+        .tag
+            width: 75px
+            margin-right: 7px 
+            &:last-child
+                margin-right: 0
 @media (max-width: 1250px)
     .container-s
         margin: 0 20vw 0 25vw
@@ -101,7 +120,48 @@
     .container-m
         width: 754px
     .general__fixed
-        display: none
+        top: 67px
+        right: auto
+        left: 0
+        width: 100vw
+        height: calc(100vh - 67px)
+        background-color: #fff
+        &_inactive
+            left: 100vw !important
+            transition: .5s left
+        #map
+            position: absolute
+            top: 0
+            left: 43px 
+            width: calc(100vw - 85px)
+            height: calc(100vh - 90px)
+        &-close
+            display: block
+        &-filters
+            display: block
+        &-popup
+            width: 439px
+            min-height: 142px
+            img
+                width: 142px
+                height: 142px
+            &-info
+                padding: 9px 0 0 12px
+            &-name
+                margin-left: 20px
+            &-desc
+                margin: 13px 0 24px 6px
+            &-close
+                top: 15.5px
+            &-filters
+                top: 15.5px
+            .tag
+                width: 80px
+                margin-right: 11px 
+                &:last-child
+                    margin-right: 0
+    .toggle
+        display: inline-flex
 @media (max-width: 950px)
     .container-s
         margin: 0 15vw 0 181px
@@ -164,6 +224,9 @@
                 border-bottom: 1px solid $mainDark20
     .general
         padding-bottom: 134.5px
+        &__fixed
+            #map
+                left: 43px 
     .slick
         &-custarr
             &-general
@@ -258,6 +321,28 @@
     .sort-by
         &__dropdown
             width: 300px
+@media (max-width: 555px)
+    .general__fixed-popup
+        width: 355px
+        min-height: 125px
+        img
+            width: 125px
+            height: 125px
+        &-info
+            padding: 7px 1px 0 5px
+        &-name
+            margin-left: 10px
+        &-desc
+            margin: 5px 0 8px 3px
+        &-close
+            top: 10px
+            right: 10px
+        .tag
+            width: 70px
+            padding: 4px 0
+            margin-right: 5px
+            &:last-child
+                margin-right: 0
 @media (max-width: 490px)
     .container
         width: calc(100% - 25px)
@@ -303,6 +388,61 @@
             margin-bottom: 24px
         &__subtitle
             margin-top: 18px
+        &__fixed
+            top: 48px
+            height: calc(100vh - 48px)
+            #map
+                left: 12px 
+                width: calc(100vw - 25px)
+                height: calc(100vh - 61px)
+            &-close
+                height: 40px
+                width: 40px
+                top: 15px
+                left: 19px
+            &-filters
+                height: 40px
+                width: 40px
+                top: 15px
+                right: 19px
+            &-popup
+                top: auto
+                bottom: 33px
+                left: 50%
+                transform: translateX(-50%)
+                width: 322px
+                min-height: 100px
+                img
+                    width: 100px
+                    height: 100px
+                &-info
+                    position: relative
+                    padding: 5px 0 0 15px
+                &-name
+                    margin-left: 0
+                    color: $highlights
+                &-desc
+                    display: none
+                &-close
+                    display: none
+                .tag
+                    width: auto
+                    min-height: auto
+                    padding: 0
+                    margin: 0 0 4px 0
+                    color: $mainDark70
+                    font-size: 13px
+                    line-height: 19px
+                    border: none
+                    text-align: left
+                    &:last-child
+                        margin-bottom: 0
+                    &:hover
+                        color: $b70
+                        background-color: #fff
+                    &__wrapper
+                        flex-direction: column
+                        margin: 1px 0 0 14px
     .boutik
         bottom: 22px
         padding-top: 13px
@@ -402,4 +542,9 @@
             font-size: 15px
             line-height: 22px
     .hamburger
-        display: block    
+        display: block   
+@media (max-width: 350px)
+    .general__fixed-popup
+        width: 273px
+        &-info
+            padding-left: 7px

@@ -1,11 +1,22 @@
 .toggle
-    display: inline-flex
+    position: absolute
+    right: 0
+    top: 3px
+    display: none
     flex-direction: row
     align-items: center
     justify-content: flex-end
-    &>div
+    &__button
         width: 53px
         height: 35px
         padding: 6px 0 8px
         text-align: center
         box-sizing: border-box
+        border-radius: 4px
+        color: $label
+        transition: .2s all
+        cursor: pointer
+        &_active
+            background-color: $highlights
+            color: #fff
+            transition: .2s all
