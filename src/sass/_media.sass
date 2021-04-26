@@ -162,6 +162,20 @@
                     margin-right: 0
     .toggle
         display: inline-flex
+    .sort-by
+        position: static
+        &__wrapper
+            display: none
+            &-mobile
+                display: block
+        &__mobile
+            &-header
+                padding: 0 100px
+            &-cathegory
+                padding: 25px 100px 0
+            &-footer
+                .btn
+                    width: 60vw !important
 @media (max-width: 950px)
     .container-s
         margin: 0 15vw 0 181px
@@ -267,15 +281,14 @@
                 font-size: 13px
                 margin-left: 7px
     .sort-by
-        position: static
-        &__wrapper
-            display: none
-            &-mobile
-                display: block
-        &__dropdown
-            left: 50%
-            transform: translate(-50%)
-            width: 50vw        
+        &__mobile
+            &-header
+                padding: 0 15px
+            &-cathegory
+                padding: 25px 21px 0
+            &-footer
+                .btn
+                    width: 75vw !important 
 @media (max-width: 748px)
     .overlay
         &__back

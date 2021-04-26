@@ -7,7 +7,7 @@ var popupBottomDelta = 0;
 
 $(document).ready(function(){
     
-    if ($(document).width() <= 1007)
+    if ($(document).width() <= 1024)
         mobileFlag = 1;
     if ($(document).width() <= 470)
         mobile470Flag = 1;
@@ -20,18 +20,18 @@ $(document).ready(function(){
     var hairstylistsLen = hairstylists.length;
     var pagesAmount = Math.trunc(hairstylistsLen / itemsPerPage) + 1;
     
-    for (var i = 0; i < hairstylistsLen; i++) {
+    for (var i = 0; i < hairstylistsLen; i++) { //parsing the items info
 
         if (i == 0) {
             var wrapper = document.createElement("div");
             wrapper.dataset.page = 1;
         }
 
-        onePagePositions.push({ lat: hairstylists[i].adress.latitude, lng: hairstylists[i].adress.longitude});
+        onePagePositions.push({ lat: hairstylists[i].adress.latitude, lng: hairstylists[i].adress.longitude});  //get position
 
         var datasetPhoto = "";
         var datasetPhotoLen = hairstylists[i].imagesOverlay.length;
-        for (var j = 0; j < datasetPhotoLen; j++)
+        for (var j = 0; j < datasetPhotoLen; j++)   //get all the photos for an boutik overlay
             if (j + 1 != datasetPhotoLen)
                 datasetPhoto += hairstylists[i].imagesOverlay[j] + ", ";
             else
@@ -39,14 +39,15 @@ $(document).ready(function(){
         
         var boutikImg = "";
         var boutikImgLen = hairstylists[i].imagesGeneral.length;
-        for (var j = 0; j < boutikImgLen; j++)
+        for (var j = 0; j < boutikImgLen; j++)  //get all the item images for general page
             boutikImg += `<img src="${hairstylists[i].imagesGeneral[j]}" alt="haircut${j + 1}">`
         
         var boutikTags = "";
         var boutikTagsLen = hairstylists[i].categories.length;
-        for (var j = 0; j < boutikTagsLen; j++)
+        for (var j = 0; j < boutikTagsLen; j++) //get all the tags
             boutikTags += `<div class="tag">${hairstylists[i].categories[j]}</div>`
 
+        //inserting the item + filling it with prepared info and info get from array
         wrapper.insertAdjacentHTML("beforeend", `
             <div class="boutik"
                 data-name="${hairstylists[i].businessName}"
@@ -77,16 +78,16 @@ $(document).ready(function(){
             </div>
         `);
 
-        if (i != 0 && ((i + 1) % itemsPerPage == 0 || i + 1 == hairstylistsLen)) {
+        if (i != 0 && ((i + 1) % itemsPerPage == 0 || i + 1 == hairstylistsLen)) {  //insert the page when the page items limit hit or items array is ended
             $('.boutik__wrapper')[0].insertAdjacentElement('beforeend', wrapper);
             var wrapper = document.createElement("div");
-            positions.push(onePagePositions);
+            positions.push(onePagePositions);   //filling up the position arr for later use with markers setting
             onePagePositions = [];
         }
     }
 
     var paginationContent = "";
-    for (var i = 0; i < pagesAmount; i++)
+    for (var i = 0; i < pagesAmount; i++)   //filling the pagination with proper pages amount
         paginationContent += `<div class="pagination__page">${i+1}</div>`;
     $('.pagination')[0].insertAdjacentHTML('beforeend', paginationContent);
 
@@ -314,13 +315,16 @@ $(document).ready(function(){
         $(this).parent().siblings('.sort-by__mobile-footer').children('button').attr('disabled', 'disabled');
     });
 
-    $('.boutik__wrapper').on('beforeChange', function(event, slick, currentSlide, nextSlide){
-        $('.pagination').slick('slickGoTo', nextSlide);
-        if (!mobileFlag) {
-            for (var i = currentSlide * itemsPerPage; i < ((markers.length - currentSlide * itemsPerPage >= itemsPerPage) ? ((currentSlide + 1) * itemsPerPage) : markers.length); i++)
-                markers[i].setMap(null);
-            for (var i = nextSlide * itemsPerPage; i < ((markers.length - nextSlide * itemsPerPage >= itemsPerPage) ? ((nextSlide + 1) * itemsPerPage) : markers.length); i++)
-                markers[i].setMap(map);
+    $('.boutik__wrapper').on('beforeChange', function(e, slick, currentSlide, nextSlide) {  //change the pagination slide + markers on the map (desktop) + scroll to top when clicking the boutic__wrapper carousel controls
+        if ($(e.target).is($('.boutik__wrapper'))) {
+            $('.pagination').slick('slickGoTo', nextSlide);
+            $('html, body').animate({scrollTop: $('.boutik__wrapper').offset().top - 32}, 350);
+            if (!mobileFlag) {
+                for (var i = currentSlide * itemsPerPage; i < ((markers.length - currentSlide * itemsPerPage >= itemsPerPage) ? ((currentSlide + 1) * itemsPerPage) : markers.length); i++)
+                    markers[i].setMap(null);
+                for (var i = nextSlide * itemsPerPage; i < ((markers.length - nextSlide * itemsPerPage >= itemsPerPage) ? ((nextSlide + 1) * itemsPerPage) : markers.length); i++)
+                    markers[i].setMap(map);
+            }
         }
     });
 
@@ -330,18 +334,23 @@ $(document).ready(function(){
     });*/
 
     
-    $('.general__fixed-close, .toggle__map').on('click', function() {
+    $('.general__fixed-close, .toggle__map').on('click', function() {   //show/hide the map
         $('body').attr('style', function(index, attr){
             return attr == 'overflow: hidden;' ? 'overflow: visible;' : 'overflow: hidden;';
         });
         $('.general__fixed').toggleClass('general__fixed_inactive');
     });
 
-    $('.general__fixed-popup-close').on('click', function() {
+    $('.general__fixed-popup-close').on('click', function() {   //hide the map popup
         $('.general__fixed-popup').addClass('general__fixed-popup_hidden');
         setTimeout(function() {
             $('.general__fixed-popup').css('display', 'none');
         }, 300);
+    });
+
+    $('.general__fixed-filters').on('click', () => {    //show the filter mobile overlay when clicking on the map "filters" button 
+        $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
+        $('.header').toggleClass('header_hidden');
     });
 
 });
@@ -352,25 +361,25 @@ var markerOpened;
 var markerOpenedZ;
 function initMap() {
     setTimeout(function() {
-        
     
-        map = new google.maps.Map(document.getElementById("map"), {
+        map = new google.maps.Map(document.getElementById("map"), { //map initialization
             center: { lat: 45.535208, lng: -73.663268},
             zoom: 10,
             mapTypeControl: false,
             streetViewControl: false,
             fullscreenControl: false,
+            gestureHandling: "greedy",
         });  
         
         var counter = 0;
-        for (var i = 0; i < positions.length; i++)
+        for (var i = 0; i < positions.length; i++)  //setting markers
             for (var j = 0; j < positions[i].length; j++) {
-                var image = {
+                var image = {   //marker image setting
                     url: "icons/marker.png",
                     size: new google.maps.Size(22, 22)
                 };
-                markers[counter] = new google.maps.Marker({
-                    position: { lat: positions[i][j].lat, lng: positions[i][j].lng},
+                markers[counter] = new google.maps.Marker({ //markers init
+                    position: { lat: positions[i][j].lat, lng: positions[i][j].lng},    //getting marker position info from prepared earlier array 
                     icon: image,
                     zIndex: counter,
                     noClear: true,
@@ -378,16 +387,16 @@ function initMap() {
                 counter++;
             }
 
-        var to = itemsPerPage;
-        if (mobileFlag)
+        var to = itemsPerPage;  //show only markers of boutiks on the first page
+        if (mobileFlag) //show all markers when page width <= 1024
             to = markers.length;
             
-        for (var i = 0; i < to; i++)
+        for (var i = 0; i < to; i++)    //show markers
             markers[i].setMap(map);
 
         for (var i = 0; i < markers.length; i++) {
-            google.maps.event.addListener(markers[i], 'click', function() {
-                if (markerOpened) {
+            google.maps.event.addListener(markers[i], 'click', function() { //click the marker
+                if (markerOpened) { //close previous marker
                     markerOpened.setIcon('icons/marker.png');
                     markerOpened.setZIndex(markerOpenedZ);
                 }
@@ -396,6 +405,7 @@ function initMap() {
                 this.setZIndex(1000);
                 markerOpened = this;
 
+                //filling the popup with info start
                 var base = hairstylists[markerOpenedZ];
                 $('.general__fixed-popup img').attr('src', base.imagesGeneral[0]);
                 $('.general__fixed-popup-name').text(base.businessName);
@@ -403,27 +413,28 @@ function initMap() {
                 $('.general__fixed-popup .tag__wrapper').text("");
                 for (var j = 0; j < base.categories.length; j++)
                     $('.general__fixed-popup .tag__wrapper')[0].insertAdjacentHTML('afterbegin', `<div class="tag">${base.categories[j]}</div>`);
+                //filling the popup with info end
                 $('.general__fixed-popup').css('display', 'flex');
                 setTimeout(function() {
                     $('.general__fixed-popup').removeClass('general__fixed-popup_hidden');
                 }, 10);
-                if (!mobile470Flag) {
+                if (!mobile470Flag) {   //if page width > 470
                     var positionPX = fromLatLngToPoint(markerOpened.position, map);
                     var top = positionPX.y + 6;
                     var left = positionPX.x;
                     $('.general__fixed-popup').css({'top': top, 'left': left, 'transform': 'translateX(-50%)', 'bottom': 'auto'});
-                    if ($('.general__fixed-popup').width() / 2 > positionPX.x - 15) 
+                    if ($('.general__fixed-popup').width() / 2 > positionPX.x - 15) //if left popup side falls out of map -> set the popup stick to left side of the map
                         $('.general__fixed-popup').css({'left': 15 + offsetDelta, 'transform': 'none'});
-                    if ($('.general__fixed-popup').width() / 2 > $('#map').width() - positionPX.x - 15)
+                    if ($('.general__fixed-popup').width() / 2 > $('#map').width() - positionPX.x - 15) //if popup side falls out of map -> set the popup stick to right side of the map
                         $('.general__fixed-popup').css({'left': 'auto', 'right': 15 + offsetDelta, 'transform': 'none'});
-                    if ($('.general__fixed-popup').height() + 6 > $('#map').height() - positionPX.y - 4)
+                    if ($('.general__fixed-popup').height() + 6 > $('#map').height() - positionPX.y - 4)    //if bottom popup side falls out of map -> set the popup under the marker
                         $('.general__fixed-popup').css({'top': 'auto', 'bottom': $('#map').height() - positionPX.y + 28 + popupBottomDelta});
                 }   
             });
         }
 
-        google.maps.event.addListener(map, 'click', function() {
-            if (markerOpened) {
+        google.maps.event.addListener(map, 'click', function() {    //show the popup when clickin the marker
+            if (markerOpened) { //closr previous popup and marker if needed
                 markerOpened.setIcon('icons/marker.png');
                 markerOpened.setZIndex(markerOpenedZ);
                 markerOpened = 0;
@@ -435,7 +446,7 @@ function initMap() {
             }, 300);
     });
 
-        map.addListener("center_changed", () => {
+        map.addListener("center_changed", () => {   //close the popup when map's scrolling
             if ($('.general__fixed-popup_hidden').length == 0) {
                 $('.general__fixed-popup').addClass('general__fixed-popup_hidden');
                 setTimeout(function() {
@@ -444,8 +455,8 @@ function initMap() {
             }
         });
 
-        $('.boutik').on('hover', function() {
-            if (markerOpened) {
+        $('.boutik').on('hover', function() {   //highlight the proper marker on the map when boutik hovering
+            if (markerOpened) { //close previous marker
                 markerOpened.setIcon('icons/marker.png');
                 markerOpened.setZIndex(markerOpenedZ);
             }
@@ -455,7 +466,7 @@ function initMap() {
             markerOpened.setZIndex(1000);
         });
 
-        $('.boutik').on('mouseleave', function() {
+        $('.boutik').on('mouseleave', function() {  //highlight the proper marker on the map when boutik mouseleaving
             if (markerOpened) {
                 markerOpened.setIcon('icons/marker.png');
                 markerOpened.setZIndex(markerOpenedZ);
@@ -464,10 +475,10 @@ function initMap() {
             }
         });
 
-    }, 100);
+    }, 150);
 };
 
-function fromLatLngToPoint(latLng, map) {
+function fromLatLngToPoint(latLng, map) {   //get the marker position in pixels relatively to map window 
     var topRight = map.getProjection().fromLatLngToPoint(map.getBounds().getNorthEast());
     var bottomLeft = map.getProjection().fromLatLngToPoint(map.getBounds().getSouthWest());
     var scale = Math.pow(2, map.getZoom());
