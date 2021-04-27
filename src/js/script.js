@@ -332,6 +332,16 @@ $(document).ready(function(){
             return attr == 'overflow: hidden;' ? 'overflow: visible;' : 'overflow: hidden;';
         });
         $('.general__fixed').toggleClass('general__fixed_inactive');
+        $('.general__fixed-popup').addClass('general__fixed-popup_hidden'); //close the popup
+        setTimeout(function() {
+            $('.general__fixed-popup').css('display', 'none');
+        }, 300);
+        if (markerOpened) { //close marker opened
+            markerOpened.setIcon('icons/marker.png');
+            markerOpened.setZIndex(markerOpenedZ);
+            markerOpened = 0;
+            markerOpenedZ = 0;
+        }
         if ($(e.target).is($('.toggle__map'))) {
             $('html, body').animate({scrollTop: 0}, 150); 
             if (mobileFlag && !mobile470Flag)   //set map height on 470 < width < 1024
@@ -443,7 +453,7 @@ function initMap() {
         }
 
         google.maps.event.addListener(map, 'click', function() {    //show the popup when clickin the marker
-            if (markerOpened) { //closr previous popup and marker if needed
+            if (markerOpened) { //close previous popup and marker if needed
                 markerOpened.setIcon('icons/marker.png');
                 markerOpened.setZIndex(markerOpenedZ);
                 markerOpened = 0;
@@ -475,7 +485,7 @@ function initMap() {
             markerOpened.setZIndex(1000);
         });
 
-        $('.boutik').on('mouseleave', function() {  //highlight the proper marker on the map when boutik mouseleaving
+        $('.boutik').on('mouseleave', function() {  //clear the proper marker on the map when boutik mouseleaving
             if (markerOpened) {
                 markerOpened.setIcon('icons/marker.png');
                 markerOpened.setZIndex(markerOpenedZ);
