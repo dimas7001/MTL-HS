@@ -287,6 +287,8 @@ $(document).ready(function(){
     $('.sort-by__wrapper-mobile .sort-by__title').on('click', function() {  //show filter menu on mobile version
         $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
         $('.header').toggleClass('header_hidden');
+        if (mobileFlag) //set mobile filter menu height on width <= 1024
+            $('.sort-by__mobile-main').css('height', window.innerHeight - 120);
     });
 
     $('.sort-by__mobile-header img').on('click', function() {   //hide filter menu on mobile version
@@ -344,20 +346,24 @@ $(document).ready(function(){
         }
         if ($(e.target).is($('.toggle__map'))) {
             $('html, body').animate({scrollTop: 0}, 150); 
-            if (mobileFlag && !mobile470Flag)   //set map height on 470 < width < 1024
+            if (mobileFlag && !mobile470Flag) //set map height on 470 < width <= 1024
                 $('.general__fixed #map').css('height', window.innerHeight - 90);
             if (mobileFlag && mobile470Flag)    //set map height on width <= 470
                 $('.general__fixed #map').css('height', window.innerHeight - 61);
         }
     });
 
-    if (mobileFlag && !mobile470Flag)   //dynamic map height resize on 470 < width < 1024
+    if (mobileFlag && !mobile470Flag)   //dynamic map height resize on 470 < width <= 1024
         $(window).on('resize', function() {
             $('.general__fixed #map').animate({height: window.innerHeight - 90}, 100);
         });
     if (mobileFlag && mobile470Flag)    //dynamic map height resize on width <= 470
         $(window).on('resize', function() {
             $('.general__fixed #map').animate({height: window.innerHeight - 61}, 100);
+        });
+    if (mobileFlag) //dynamic mobile filter menu height resize on width <= 1024
+        $(window).on('resize', function() {
+            $('.sort-by__mobile-main').css('height', window.innerHeight - 120);
         });
 
     $('.general__fixed-popup-close').on('click', function() {   //hide the map popup
@@ -370,6 +376,8 @@ $(document).ready(function(){
     $('.general__fixed-filters').on('click', () => {    //show the filter mobile overlay when clicking on the map "filters" button 
         $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
         $('.header').toggleClass('header_hidden');
+        if (mobileFlag) //set mobile filter menu height on width <= 1024
+            $('.sort-by__mobile-main').css('height', window.innerHeight - 120);
     });
 
 });
