@@ -7,14 +7,13 @@ var popupBottomDelta = 0;
 
 $(document).ready(function(){
     
-    if ($(document).width() <= 1024)
-        mobileFlag = 1;
-    if ($(document).width() <= 470)
-        mobile470Flag = 1;
     if ($(document).width() <= 1024) {
+        mobileFlag = 1;
         offsetDelta = 43;
         popupBottomDelta = 22;
     }
+    if ($(document).width() <= 470)
+        mobile470Flag = 1;
         
 
     var hairstylistsLen = hairstylists.length;
@@ -327,19 +326,29 @@ $(document).ready(function(){
             }
         }
     });
-
-    /*$('.toggle__button:not(.toggle__button.toggle__button_active)').on('click', function() {
-        $('.toggle__button_active').toggleClass('toggle__button_active');
-        $(this).toggleClass('toggle__button_active');
-    });*/
-
     
-    $('.general__fixed-close, .toggle__map').on('click', function() {   //show/hide the map
-        $('body').attr('style', function(index, attr){
+    $('.general__fixed-close, .toggle__map').on('click', function(e) {   //show/hide the map
+        $('body').attr('style', function(index, attr) {
             return attr == 'overflow: hidden;' ? 'overflow: visible;' : 'overflow: hidden;';
         });
         $('.general__fixed').toggleClass('general__fixed_inactive');
+        if ($(e.target).is($('.toggle__map'))) {
+            $('html, body').animate({scrollTop: 0}, 150); 
+            if (mobileFlag && !mobile470Flag)   //set map height on 470 < width < 1024
+                $('.general__fixed #map').css('height', window.innerHeight - 90);
+            if (mobileFlag && mobile470Flag)    //set map height on width <= 470
+                $('.general__fixed #map').css('height', window.innerHeight - 61);
+        }
     });
+
+    if (mobileFlag && !mobile470Flag)   //dynamic map height resize on 470 < width < 1024
+        $(window).on('resize', function() {
+            $('.general__fixed #map').animate({height: window.innerHeight - 90}, 100);
+        });
+    if (mobileFlag && mobile470Flag)    //dynamic map height resize on width <= 470
+        $(window).on('resize', function() {
+            $('.general__fixed #map').animate({height: window.innerHeight - 61}, 100);
+        });
 
     $('.general__fixed-popup-close').on('click', function() {   //hide the map popup
         $('.general__fixed-popup').addClass('general__fixed-popup_hidden');
