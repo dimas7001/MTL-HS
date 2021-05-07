@@ -78,7 +78,7 @@ $(document).ready(function(){
         `);
 
         if (i != 0 && ((i + 1) % itemsPerPage == 0 || i + 1 == hairstylistsLen)) {  //insert the page when the page items limit hit or items array is ended
-            $('.boutik__wrapper')[0].insertAdjacentElement('beforeend', wrapper);
+            //$('.boutik__wrapper')[0].insertAdjacentElement('beforeend', wrapper);
             var wrapper = document.createElement("div");
             positions.push(onePagePositions);   //filling up the position arr for later use with markers setting
             onePagePositions = [];
@@ -106,18 +106,20 @@ $(document).ready(function(){
         mobileFirst: false
     });
 
-    $('.boutik__img').slick({   //image carousel on each boutik item
+    $('.boutik__service-wrapper').slick({   //service carousel for each boutik item
         speed: 300,
         infinite: true,
         slidesToShow: 1,
         slidesToScroll: 1,
         centerMode: false,
-        variableWidth: true,
+        variableWidth: false,
         adaptiveHeight: true,
-        swipeToSlide: true,
+        swipeToSlide: false,
+        swipe: false,
         prevArrow: '<button type="button" class="slick-prev slick-custarr slick-custarr-mini"></button>',
         nextArrow: '<button type="button" class="slick-next slick-custarr slick-custarr-mini"></button>',
         arrows: true,
+        dots: true,
         responsive: [{
             breakpoint: 471,
             settings: {
@@ -147,39 +149,18 @@ $(document).ready(function(){
     });
 
     $('.boutik__info, .boutik__img img').on('click', function() { //read an info fron boutik dataset, parse it to an overlay and show the overlay
-        $('.overlay__carousel').text('');
+       /*$('.overlay__carousel').text('');
         var photos =  $(this).parents('.boutik').data('photo').split(', ');
         for (var i = 0; i < photos.length; i++)
             $('.overlay__carousel')[0].insertAdjacentHTML('beforeend', `<img src="${photos[i]}" alt="haircut_photo${i + 1}">`);
-    
-        $('.overlay__top-wrapper img').attr("src", $(this).parents('.boutik').data('avatar'));
+        $('.overlay .overlay__top-wrapper img').attr("src", $(this).parents('.boutik').data('avatar'));
         $('.overlay__name').text($(this).parents('.boutik').data('name'));
         $('.overlay__type').text($(this).parents('.boutik').data('subtitle'));
         $('.overlay__text').text('');
-        $('.overlay__text')[0].insertAdjacentHTML('beforeend', $(this).parents('.boutik').data('text'));
+        $('.overlay__text')[0].insertAdjacentHTML('beforeend', $(this).parents('.boutik').data('text'));*/
         setTimeout(function() {
             $('.header').toggleClass('header_hidden');
             $('.overlay').toggleClass('overlay_hidden');
-            $('.overlay__carousel').slick({ //initialisation of an overlay carousel
-                speed: 300,
-                infinite: true,
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                centerMode: false,
-                variableWidth: true,
-                adaptiveHeight: true,
-                swipeToSlide: true,
-                prevArrow: '<button type="button" class="slick-prev slick-custarr"><img src="icons/arrow_left.svg" alt="prev"></button>',
-                nextArrow: '<button type="button" class="slick-next slick-custarr"><img src="icons/arrow_right.svg" alt="next"></button>',
-                arrows: true,
-                dots: true,
-                responsive: [{
-                    breakpoint: 471,
-                    settings: {
-                        arrows: false
-                    }
-                }]
-            });
             if ($(window).height() > $('body').height())
                 $('.overlay').css('height', 'calc(100vh - ' + $('.header').height() + 'px)');
             if ($(document).width() > 470)
@@ -215,15 +196,15 @@ $(document).ready(function(){
             }
     });
 
-    $('.sort-by__wrapper:not(.sort-by__wrapper-mobile) .sort-by__title').on('click', function() {   //fires when desktop/tblet sort-by activation button clicked
-        if ($(this).is($('.sort-by__title_active'))) {  //if this dropdown already opened -> close it
-            $(this).removeClass('sort-by__title_active');
+    $('.sort-by__wrapper:not(.sort-by__wrapper-mobile) .sort-by__title').on('click', function() {   //fires when desktop/tablet sort-by activation button clicked
+        if (!$(this).is($('.sort-by__title_active'))) {  //if this dropdown already opened -> close it
+            /*$(this).removeClass('sort-by__title_active');
             $(this).siblings('.sort-by__dropdown').addClass('sort-by__dropdown_inactive');
             setTimeout(function() {
                 $(this).siblings('.sort-by__dropdown').attr('style', 'display: none !important');
             }, 300);
             dropdownActiveFlag = 0;
-        } else {    //this dropdown was closed -> open it
+        } else {   */ //this dropdown was closed -> open it
             $('.sort-by__title_active').removeClass('sort-by__title_active');
             var element = $('.sort-by__dropdown:not(.sort-by__dropdown_inactive)');
             element.addClass('sort-by__dropdown_inactive');
@@ -512,6 +493,52 @@ function fromLatLngToPoint(latLng, map) {   //get the marker position in pixels 
     var worldPoint = map.getProjection().fromLatLngToPoint(latLng);
     return new google.maps.Point((worldPoint.x - bottomLeft.x) * scale, (worldPoint.y - topRight.y) * scale);
 }
+
+function insert(str, index, value) {    //insertion
+    return str.substr(0, index) + value + str.substr(index);
+}
+
+$('#my-search').on('input', function() { //highlight the matchings when subsring entered to search field
+    let val = $(this).val().toLowerCase();
+    let searchItems = $('.sort-by__cathegory li');
+    if (val.length)        
+        for (let i = 0; i < searchItems.length; i++) {
+            let searchItemContent = searchItems[i].textContent,
+                searchItemContentLC = searchItemContent.toLowerCase();
+            searchItemContent.replace('<b>', '');
+            searchItemContent.replace('</b>', '');
+            let from = [];
+            let flag = 0;//from[0];
+            let pos = 0;
+            while (flag != -1) {
+                pos = searchItemContentLC.indexOf(val, pos);
+                from.push(pos);
+                flag = pos;
+                if (pos != -1)
+                    pos += val.length;
+            }
+            let delta = 7;
+            let deltaFT = 3;
+            for (let j = 0; j < from.length; j++)
+                if (from[j] != -1) {
+                    searchItemContent = insert(`${searchItemContent}`, from[j] + delta*j, `<b>`);
+                    //console.log(from[j] + delta*j);
+                    searchItemContent = insert(`${searchItemContent}`, from[j] + val.length + delta*j + deltaFT, `</b>`);
+                    //console.log(from[j] + val.length + delta*j + deltaFT*(j+1));
+                }
+            from = [];
+            searchItems[i].textContent = '';
+            searchItems[i].insertAdjacentHTML('afterbegin', searchItemContent);
+        }
+    else
+        for (let i = 0; i < searchItems.length; i++) {
+            let searchItemContent = searchItems[i].textContent;
+            searchItemContent.replace('<b>', '');
+            searchItemContent.replace('</b>', '');
+            searchItems[i].textContent = '';
+            searchItems[i].insertAdjacentHTML('afterbegin', searchItemContent);
+        }
+});
 
 
 

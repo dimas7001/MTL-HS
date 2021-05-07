@@ -12,39 +12,74 @@
         &-mobile
             display: none
     &__title
+        height: 41px
+        width: 407px
         display: inline-block
-        padding: 11px 25px 9px 24px
-        border: 1px solid $highlights
+        padding: 11px 25px 9px 39px
+        border: 1px solid $mainDark
         border-radius: 50px
         box-sizing: border-box
-        color: $highlights
+        color: #000
         cursor: pointer
         transition: .2s all
+        caret-color: $mainDark60
         &:hover
-            color: #fff
-            background-color: $highlights
+            box-shadow: 2px 2px 5px $mainDark60
             transition: .2s all
-        &_active
-            color: #fff
-            background-color: $highlights
+        &:active, &:focus
+            outline: none
+            box-shadow: none
             transition: .2s all
+        &::placeholder
+            color: $mainDark60
+        & + label
+            top: 14px
+            left: 16px
+            position: absolute
+            content: ""
+            display: block
+            height: 14px
+            width: 15px
+            background-color: #fff
+            background-image: url('../icons/search.svg')
+            background-position: 0 0
+            background-size: cover
+            background-repeat: no-repeat
+            cursor: pointer
     &__dropdown
-        width: 400px
+        width: 382px
         box-sizing: border-box
         position: absolute
-        top: 55px
-        left: 0
+        top: 46px
+        left: 13px
         padding-top: 30px
         background-color: #fff
-        border-radius: 15px
-        border: 1px solid $highlights70
+        border-radius: 5px
+        border: 1px solid $mainDark60
         z-index: 10
         transition: .3s all
         display: none
+        padding: 9px 22px 9px 25px
+        box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.25)
         &_inactive
             opacity: 0
             transform: scaleY(1)
             transition: .3s all
+    &__cathegory
+        &-title
+            text-transform: uppercase
+            color: $highlights
+        ul
+            margin: 14px 0
+            padding: 0
+            list-style: none
+            li
+                margin: 0
+                padding: 8px 0 14px 22px
+                border-bottom: 1px solid $mainDark10
+                cursor: pointer
+                &:first-child
+                    border-top: 1px solid $mainDark10
     &__list
         border-bottom: 1px solid $highlights40
     &__item
