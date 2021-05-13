@@ -93,6 +93,21 @@
 @media (max-width: 1250px)
     .container-s
         margin: 0 20vw 0 25vw
+@media (max-width: 1222px)
+    .boutik .slick-dots
+        top: 200px
+    .slick-custarr-mini
+        top: 103px
+@media (max-width: 1180px)
+    .boutik .slick-dots
+        top: 193px
+    .slick-custarr-mini
+        top: 100px
+@media (max-width: 1140px)
+    .boutik .slick-dots
+        top: 186px
+    .slick-custarr-mini
+        top: 98px
 @media (max-width: 1159px)
     .container-m
         width: calc(100vw - 580px)
@@ -103,19 +118,34 @@
         width: calc(100vw - 560px)
     .general__fixed
         right: 35px
+@media (max-width: 1090px)
+    .boutik .slick-dots
+        top: 180px
+    .slick-custarr-mini
+        top: 95px
 @media (max-width: 1080px)
     .container-m
         width: calc(100vw - 570px)
     .general__fixed
         right: 30px
+@media (max-width: 1070px)
+    .boutik .slick-dots
+        top: 173px
+    .slick-custarr-mini
+        top: 92px
 @media (max-width: 1050px)
     .container
         &-s
-            margin: 0 20vw 0 20vw
+            margin: 0 auto
         &-m
             width: calc(100vw - 555px)
     .general__fixed
         right: 15px
+@media (max-width: 1040px)
+    .boutik .slick-dots
+        top: 167px
+    .slick-custarr-mini
+        top: 89px
 @media (max-width: 1024px)
     .container-m
         width: 754px
@@ -160,46 +190,24 @@
                 margin-right: 11px 
                 &:last-child
                     margin-right: 0
-    .toggle
-        display: inline-flex
-    .sort-by
-        position: static
-        &__wrapper
-            display: none
-            &-mobile
-                display: block
-        &__mobile
-            &-header
-                padding: 0 100px
-            &-cathegory
-                padding: 25px 100px 0
-            &-footer
-                .btn
-                    width: 60vw !important
+    .toggle__button
+        display: block
+    .boutik
+        padding-left: 0
+        .slick-dots
+            top: 213px
+    .slick-custarr-mini
+        top: 108px
 @media (max-width: 950px)
-    .container-s
-        margin: 0 15vw 0 181px
     .overlay
         &__back
             left: -105px
-        &__text::after
-            width: calc(100% + 130px)
-@media (max-width: 930px)
-    .overlay
-        &__text::after
-            width: calc(100% + 80px)
 @media (max-width: 880px)
-    .container
-        &-s
-            width: 70vw
-            margin-left: calc(7vw + 107px)
     .overlay
         &__carousel
             width: 70vw
             img
                 width: 70vw
-        &__text::after
-            width: calc(100% + 50px)
 @media (max-width: 850px)
     .container
         margin-left: 40px
@@ -207,16 +215,11 @@
             width: calc(100% - 70px)
             margin: 0 30px 0 40px
 @media (max-width: 830px)
-    .container
-        &-s
-            width: 65vw
     .overlay
         &__carousel
             width: 65vw
             img
                 width: 65vw
-        &__text::after
-            width: calc(100% + 70px)
 @media (max-width: 769px)
     .header
         padding-top: 17px
@@ -228,10 +231,12 @@
         width: calc(100% - 70px)
         margin: 0 30px 0 40px
         &-s
-            width: 462px
-            margin: 0 20.68vw 0 19.12vw
+            width: calc(100% - 119px)
+            margin: 0 62px 0 57px
+        &-m
+            width: calc(100% - 120px)
+            margin: 0 63px 0 57px
     .boutik
-        padding-bottom: 55px
         &__wrapper
             &>div .boutik:last-child
                 padding-bottom: 66px
@@ -261,9 +266,7 @@
             img
                 width: 462px
         &__text
-            margin: 22px 0 60px
-            &::after
-                display: none
+            margin: 22px 0 100px
         &__back
             left: -107px
         &__top-wrapper
@@ -280,25 +283,27 @@
                 margin-left: 16px
                 font-size: 13px
                 margin-left: 7px
-    .sort-by
-        &__mobile
-            &-header
-                padding: 0 15px
-            &-cathegory
-                padding: 25px 21px 0
-            &-footer
-                .btn
-                    width: 75vw !important
     .pagination
         bottom: -83px 
+    .slick-custarr-mini
+        display: none !important
 @media (max-width: 748px)
     .overlay
         &__back
             left: -100px
+    .boutik .slick-dots
+        top: 204px
+    .slick-custarr-mini
+        top: 103px
 @media (max-width: 728px)
     .overlay
         &__back
             left: -93px
+@media (max-width: 720px)
+    .boutik .slick-dots
+        top: 196px
+    .slick-custarr-mini
+        top: 100px
 @media (max-width: 708px)
     .overlay
         &__back
@@ -307,17 +312,39 @@
     .overlay
         &__back
             left: -79px
+    .boutik .slick-dots
+        top: 190px
+    .slick-custarr-mini
+        top: 98px
+@media (max-width: 670px)
+    .boutik .slick-dots
+        top: 184px
+    .slick-custarr-mini
+        top: 96px
 @media (max-width: 660px)
-    .container-s
-        width: 70vw
-        margin: 0 20.68vw 0 19.12vw
     .overlay
-        &__carousel
-            width: 70vw 
-            img
-                width: 70vw
+        &__top-wrapper
+            margin-left: 30vw
         &__back
             left: -70px
+@media (max-width: 640px)
+    .boutik .slick-dots
+        top: 176px
+    .slick-custarr-mini
+        top: 93px
+@media (max-width: 620px)
+    .boutik .slick-dots
+        top: 172px
+    .slick-custarr-mini
+        top: 89px
+@media (max-width: 600px)
+    .boutik .slick-dots
+        top: 167px
+    .slick-custarr-mini
+        top: 87px
+    .overlay
+        &__top-wrapper
+            margin-left: 25vw
 @media (max-width: 585px)
     .container
         width: calc(100% - 50px)
@@ -325,17 +352,21 @@
         &-m
             width: calc(100% - 50px)
             margin: 0 20px 0 30px
-    .boutik
-        &__img
-            width: 30vw
-            height: 30vw
-            img
-                width: 30vw
-        &__info
-            margin-left: 15px
+        &-s
+            width: calc(100% - 50px)
+            margin: 0 20px 0 30px
     .sort-by
         &__dropdown
             width: 300px
+    .boutik .slick-dots
+        top: 177px
+    .slick-custarr-mini
+        top: 93px
+@media (max-width: 570px)
+    .boutik .slick-dots
+        top: 175px
+    .slick-custarr-mini
+        top: 91px
 @media (max-width: 555px)
     .general__fixed-popup
         width: 355px
@@ -358,6 +389,18 @@
             margin-right: 5px
             &:last-child
                 margin-right: 0
+    .boutik .slick-dots
+        top: 172px
+    .slick-custarr-mini
+        top: 89px
+@media (max-width: 520px)
+    .boutik .slick-dots
+        top: 163px
+    .slick-custarr-mini
+        top: 86px
+    .overlay
+        &__top-wrapper
+            margin-left: 22vw
 @media (max-width: 490px)
     .container
         width: calc(100% - 25px)
@@ -365,13 +408,10 @@
         &-m
             width: calc(100% - 25px)
             margin: 0 10px 0 15px
-    .boutik
-        &__img
-            width: 30vw
-            img
-                width: 30vw
-        &__info
-            margin-left: 15px
+    .boutik .slick-dots
+        top: 160px
+    .slick-custarr-mini
+        top: 84px
 @media (max-width: 470px)
     h2
         font-size: 16px
@@ -389,7 +429,7 @@
         position: relative
         height: 48px
         padding-top: 11px
-        z-index: 100
+        z-index: 110
         &_hidden
             transform: translateY(-100%)
         &__logo
@@ -400,7 +440,7 @@
         padding-top: 13px
         padding-bottom: 62px
         &__title
-            margin-bottom: 24px
+            margin-bottom: 15px
         &__subtitle
             margin-top: 18px
         &__fixed
@@ -460,24 +500,19 @@
                         flex-direction: column
                         margin: 1px 0 0 14px
     .boutik
-        bottom: 22px
         padding-top: 13px
-        padding-bottom: 31px
+        padding-bottom: 34px
         padding-right: 0
         //margin-left: 1px
-        &::before
-            width: 100%
         &__img
-            position: absolute
-            top: 79px
-            left: 0
-            width: 100%
-            height: 161px
+            flex-wrap: wrap
+            margin-bottom: 26px
             img
-                width: 161px
-                height: 161px
-                margin-right: 13px
-                &:last-child
+                width: calc((100% - 13px) / 2)
+                margin: 0 13px 13px 0
+                &:nth-child(3), &:nth-child(4)
+                    margin-bottom: 0
+                &:nth-child(2n)
                     margin-right: 0
         &__info
             margin-left: 0
@@ -488,15 +523,14 @@
                 &:last-child
                     padding-bottom: 42px
                 &:first-child
-                    margin-top: 66px
+                    margin-top: 24px
         &__top-wrapper
             padding-right: 0
         &__location
-            margin-top: 4px
             a
-                margin-left: 10.5px
+                margin-left: 5px
         &__desc
-            margin-top: 201px
+            margin-top: 5px
     .slick
         &-custarr
             &-general
@@ -523,46 +557,66 @@
         width: 100vw
         height: 100vh
         overflow-y: scroll
-        padding-top: 51px
+        padding-top: 66px
         &_hidden
             left: 100%
-        &__carousel
-            width: 100vw
-            transform: translateX(-21px)
+        &__img
             img
-                width: 100vw
+                flex-basis: auto
+                width: calc((100% - 13px) / 2)
         &__gen-top-wrapper
             display: flex
             flex-direction: row
             justify-content: flex-start
             align-items: flex-start
-            margin-bottom: 20px
+            margin-bottom: 19px
         &__back
-            position: static
-            margin: 0 31px 0 -2px
+            margin: 0
         &__top-wrapper
             margin-bottom: 0
+            margin-left: 34px
             img
-                height: 45px
-                width: 45px
-        &__share
-            margin-top: 15px
-            img
-                height: 19px
-            span
-                margin-left: 16px
-                font-size: 13px
-                line-height: 19px
+                height: 50px
+                width: 50px
+        &__titles
+            margin-left: 8px
+        h4
+            margin-bottom: 8px
         &__text
-            margin: 25px 0 30px
+            margin: 25px 0 85px
             font-size: 15px
             line-height: 22px
+        .boutik
+            &__location
+                margin-top: 6px
     .hamburger
         display: block   
     .pagination
         bottom: -37px 
+    .sort-by
+        &__title
+            width: 62.93vw
+    .boutik .slick-dots
+        top: 490px
+@media (max-width: 465px)
+    .boutik .slick-dots
+        top: 483px
+
+@for $i from 0 to 5
+    @media (max-width: 455px - 9px * $i)
+        .boutik .slick-dots
+            top: 474px - 10px * $i
+
+@for $i from 0 to 15
+    @media (max-width: 410px - 10px * $i)
+        .boutik .slick-dots
+            top: 424px - 10px * $i
+
 @media (max-width: 350px)
     .general__fixed-popup
         width: 273px
         &-info
             padding-left: 7px
+    .sort-by
+        &__title
+            width: 55vw

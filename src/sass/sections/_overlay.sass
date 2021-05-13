@@ -35,7 +35,7 @@
         flex-direction: row
         justify-content: flex-start
         align-items: flex-end
-        margin: 1px 0 0 13.68vw
+        margin: 1px 0 0 196px
         img
             width: 50px
             height: 50px
@@ -48,6 +48,7 @@
     h4
         margin: 0 0 7px 0
     &__img
+        width: 100%
         display: flex
         flex-direction: row
         justify-content: space-between
@@ -56,9 +57,12 @@
         border-radius: 3px
         margin-bottom: 13px
         img
-            width: 152px
-            height: 152px
+            flex-shrink: 1
+            flex-basis: 152px
             border-radius: 3px
+            margin-right: 13px
+            &:last-child
+                margin-right: 0
     &__share
         display: flex
         flex-direction: row
@@ -74,18 +78,8 @@
             color: $highlights
             margin-left: 15.5px
     &__text
-        margin: 19px 0 96px
+        margin: 19px 0 100px
         padding: 0 2px 0 3px
-        &::after
-            content: ""
-            display: block
-            position: absolute
-            background-color: $mainDark20
-            height: 1px
-            width: calc(100% + 184px)
-            bottom: -46px 
-            left: 50%
-            transform: translateX(-50%)
     &__price
         display: flex
         flex-direction: row
@@ -107,6 +101,8 @@
                 flex-direction: column
                 justify-content: flex-start
                 align-items: flex-start
+                &:nth-child(2)
+                    width: 55px
             &-name
                 margin-bottom: 2px
         &-from
@@ -118,3 +114,36 @@
             margin-top: 2px
     &__time
         color: $mainDark60
+    &__to-website
+        width: 100vw
+        height: 60px
+        padding-top: 13px
+        box-sizing: border-box
+        position: fixed
+        bottom: 0
+        left: 0
+        background-color: #fff
+        box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.25)
+        transition: .5s all
+        &_hidden
+            left: 110%
+            transition: .5s all
+        a
+            display: block
+            margin: 0 auto
+            text-decoration: none
+            vertical-align: middle
+            text-align: center
+            box-sizing: border-box
+            height: 35px
+            width: 143px
+            background-color: $highlights
+            color: #fff
+            padding-top: 7px
+            border-radius: 50px
+            border: 1px solid $highlights
+            transition: .2s all
+            &:hover
+                background-color: #fff
+                color: $highlights
+                transition: .2s all

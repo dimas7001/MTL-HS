@@ -5,6 +5,86 @@ var mobile470Flag = 0;
 var offsetDelta = 0;
 var popupBottomDelta = 0;
 
+function cutString(str, maxLen) {   //cut the string to needed char amout without word tearing apart
+    var forCut = str.indexOf(' ', maxLen);
+    if (forCut == -1) return str + '..';
+    return str.substring(0, forCut) + '...'
+}
+
+function getServiceImg(service, n) {   //get 4 first photos of service
+    var serviceImg = "";
+    var serviceImgLen = service.pictures.length;
+    for (var z = 0; z < serviceImgLen; z++)  //get all the service images
+        if (z < n)
+            serviceImg += `<img src="${service.pictures[z]}" alt="haircut${z + 1}">`
+    return serviceImg;
+};
+
+function getPrice(service) {    //get price or price options blocks of the service
+    var priceBlock = "";
+    var price = "";
+
+    if (service.pricingOptions) {
+        let priOp = service.pricingOptions;
+        for (let i = 0; i < priOp.length; i++) {
+
+            if (priOp[i].priceType == "From") //fill in the service pricing info 
+                price = `
+                    <div>
+                        <div class="overlay__price-from">From</div>
+                        <div>${priOp[i].specialPrice}</div>
+                    </div>
+                `;
+            else if (priOp[i].specialPrice)
+                    price = `
+                        <div>
+                            <div>${priOp[i].specialPrice}</div>
+                            <div class="overlay__price-old">${priOp[i].price}</div>
+                        </div>
+                    `;
+                else 
+                    price = `<div>${priOp[i].price}</div>`;            
+
+            //calculate the time
+            var hours = priOp[i].duration / 60 | 0;
+            var minutes = priOp[i].duration % 60;
+            if (hours && minutes)
+                var duration = `${hours}h ${minutes}min`;
+            else if (!hours && minutes)
+                    var duration = `${minutes}min`;
+                else
+                    var duration = `${hours}h`;
+
+            priceBlock += `
+                <div class="overlay__price-option text-m">
+                    <div>
+                        <div class="overlay__price-option-name">${priOp[i].pricingName}</div>
+                        <div class="overlay__time">${duration}</div>
+                    </div>
+                    ${price}
+                </div>
+            `;
+        }
+    } else {    //if service has no pricing options
+        var hours = service.price.duration / 60 | 0;
+        var minutes = service.price.duration % 60;
+        if (hours && minutes)
+            var duration = `${hours}h ${minutes}min`;
+        else if (!hours && minutes)
+                var duration = `${minutes}min`;
+            else
+                var duration = `${hours}h`;
+        priceBlock = `
+            <div class="overlay__price text-m">
+                <div class="overlay__time">${duration}</div>
+                <div>${service.price.specialPrice ? price = service.price.specialPrice : price = service.price.price}</div>
+            </div>
+        `;
+    }
+
+    return priceBlock;
+}
+
 $(document).ready(function(){
     
     if ($(document).width() <= 1024) {
@@ -32,12 +112,6 @@ $(document).ready(function(){
         var serviceListLen = hairstylists[i].services.length;
         for (var j = 0; j < serviceListLen; j++) {  //get the info of all services
 
-            var serviceImg = "";
-            var serviceImgLen = hairstylists[i].services[j].pictures.length;
-            for (var z = 0; z < serviceImgLen; z++)  //get all the service images
-                if (z < 4)
-                    serviceImg += `<img src="${hairstylists[i].services[j].pictures[z]}" alt="haircut${z + 1}">`
-
             var priceBlock = "";
             var severalPrices = "";
             if (hairstylists[i].services[j].price.priceType == "From") { //fill in the service pricing info 
@@ -63,7 +137,7 @@ $(document).ready(function(){
             else if (!hours && minutes)
                     var duration = `${minutes}min`;
                 else
-                    var duration = `${hours}h`;
+                    var duration = `${hours}h`;                
 
             serviceList += `
                 <div class="boutik__service" data-order="${j}">
@@ -74,10 +148,10 @@ $(document).ready(function(){
                         </div>
                     </div>
                     <div class="boutik__img">
-                        ${serviceImg}
+                        ${getServiceImg(hairstylists[i].services[j], 4)}
                     </div>
                     <div class="boutik__time text-m">${duration}</div>
-                    <div class="boutik__desc text-m">${hairstylists[i].services[j].description}</div>
+                    <div class="boutik__desc text-m">${cutString(hairstylists[i].services[j].description, 247)}</div>
                 </div>
             `;
         }
@@ -87,7 +161,7 @@ $(document).ready(function(){
         //inserting the item + filling it with prepared info and info get from array
         wrapper.insertAdjacentHTML("beforeend", `
             <div class="boutik"
-                data-idg="${hairstylists[i]._id}
+                data-idg="${hairstylists[i]._id}"
                 data-idl="${i}"
             >
                 <div class="overlay__top-wrapper">
@@ -96,7 +170,7 @@ $(document).ready(function(){
                         <h3 class="boutik__name">${hairstylists[i].businessName}</h3>
                         <div class="boutik__location">
                             <img src="icons/location.svg" alt="location">
-                            <a href="#" class="text-s" tabindex="0">${hairstylists[i].address.street.slice(0, 7)}</a>
+                            <a href="#" class="text-s" tabindex="0">${hairstylists[i].address.street}</a>
                         </div>
                     </div>
                 </div>
@@ -113,72 +187,7 @@ $(document).ready(function(){
             onePagePositions = [];
         }
     }
-    
-    /*for (var i = 0; i < hairstylistsLen; i++) { //parsing the items info
 
-        if (i == 0) {
-            var wrapper = document.createElement("div");
-            wrapper.dataset.page = 1;
-        }
-
-        onePagePositions.push({ lat: hairstylists[i].adress.latitude, lng: hairstylists[i].adress.longitude});  //get position
-
-        var datasetPhoto = "";
-        var datasetPhotoLen = hairstylists[i].imagesOverlay.length;
-        for (var j = 0; j < datasetPhotoLen; j++)   //get all the photos for an boutik overlay
-            if (j + 1 != datasetPhotoLen)
-                datasetPhoto += hairstylists[i].imagesOverlay[j] + ", ";
-            else
-                datasetPhoto += hairstylists[i].imagesOverlay[j];
-        
-        var boutikImg = "";
-        var boutikImgLen = hairstylists[i].imagesGeneral.length;
-        for (var j = 0; j < boutikImgLen; j++)  //get all the item images for general page
-            boutikImg += `<img src="${hairstylists[i].imagesGeneral[j]}" alt="haircut${j + 1}">`
-        
-        var boutikTags = "";
-        var boutikTagsLen = hairstylists[i].categories.length;
-        for (var j = 0; j < boutikTagsLen; j++) //get all the tags
-            boutikTags += `<div class="tag">${hairstylists[i].categories[j]}</div>`
-
-        //inserting the item + filling it with prepared info and info get from array
-        wrapper.insertAdjacentHTML("beforeend", `
-            <div class="boutik"
-                data-name="${hairstylists[i].businessName}"
-                data-subtitle="${hairstylists[i].subtitleOverlay}"
-                data-text="${hairstylists[i].textOverlay}"
-                data-photo="${datasetPhoto}"
-                data-avatar="${hairstylists[i].avatar}"
-                data-id="${hairstylists[i].id}"
-            >
-                <div class="boutik__img">${boutikImg}</div>
-                <div class="boutik__info">
-                    <div class="boutik__top-wrapper">
-                        <div>
-                            <h3 class="boutik__name">${hairstylists[i].businessName}</h3>
-                            <div class="boutik__location">
-                                <img src="icons/location.svg" alt="location">
-                                <a href="#" class="text-m">Address</a>
-                            </div>
-                        </div>
-                        <div class="boutik__website">
-                            <img src="icons/send.svg" alt="send-button">
-                            <a href="${hairstylists[i].website}" class="text-s">Website</a>
-                        </div>
-                    </div>
-                    <div class="boutik__desc text-m">${hairstylists[i].description}</div>
-                    <div class="tag__wrapper text-m-b">${boutikTags}</div>
-                </div>
-            </div>
-        `);
-
-        if (i != 0 && ((i + 1) % itemsPerPage == 0 || i + 1 == hairstylistsLen)) {  //insert the page when the page items limit hit or items array is ended
-            //$('.boutik__wrapper')[0].insertAdjacentElement('beforeend', wrapper);
-            var wrapper = document.createElement("div");
-            positions.push(onePagePositions);   //filling up the position arr for later use with markers setting
-            onePagePositions = [];
-        }
-    }*/
 
     var paginationContent = "";
     for (var i = 0; i < pagesAmount; i++)   //filling the pagination with proper pages amount
@@ -216,16 +225,9 @@ $(document).ready(function(){
         arrows: true,
         dots: true,
         responsive: [{
-            breakpoint: 471,
+            breakpoint: 768,
             settings: {
-                slidesToShow: 2,
-                arrows: false
-            }
-        },{
-            breakpoint: 375,
-            settings: {
-                slidesToShow: 1,
-                arrows: false
+                swipe: true
             }
         }]
     });
@@ -243,33 +245,35 @@ $(document).ready(function(){
         swipe: false
     });
 
-    $('.boutik__info, .boutik__img img').on('click', function() { //read an info fron boutik dataset, parse it to an overlay and show the overlay
-       /*$('.overlay__carousel').text('');
-        var photos =  $(this).parents('.boutik').data('photo').split(', ');
-        for (var i = 0; i < photos.length; i++)
-            $('.overlay__carousel')[0].insertAdjacentHTML('beforeend', `<img src="${photos[i]}" alt="haircut_photo${i + 1}">`);
-        $('.overlay .overlay__top-wrapper img').attr("src", $(this).parents('.boutik').data('avatar'));
-        $('.overlay__name').text($(this).parents('.boutik').data('name'));
-        $('.overlay__type').text($(this).parents('.boutik').data('subtitle'));
-        $('.overlay__text').text('');
-        $('.overlay__text')[0].insertAdjacentHTML('beforeend', $(this).parents('.boutik').data('text'));*/
+    $('.boutik__service').on('click', function() { //read an info from boutik dataset, parse it to an overlay and show the overlay
+        var boutik = hairstylists[$(this).parents('.boutik').data('idl')];
+        var service = boutik.services[$(this).data('order')];
+        $('.overlay .overlay__top-wrapper>img').attr("src", boutik.avatar);
+        $('.overlay .boutik__name').text(boutik.businessName);
+        $('.overlay .boutik__location a').text(hairstylists[i].address.street);
+        $('.overlay h4').text(service.name);
+        $('.overlay__price-option').remove();
+        $('.overlay__price').remove();
+        $('.overlay__img').text("");
+        $('.overlay__img')[0].insertAdjacentHTML('afterbegin', getServiceImg(service, !mobile470Flag ? 4 : 2));
+        $('.overlay__img')[0].insertAdjacentHTML('afterend', getPrice(service));
+        $('.overlay__text').text(service.description);
+        $('.overlay__to-website a').attr("href", boutik.website);
         setTimeout(function() {
-            $('.header').toggleClass('header_hidden');
             $('.overlay').toggleClass('overlay_hidden');
-            if ($(window).height() > $('body').height())
+            $('.overlay__to-website').toggleClass('overlay__to-website_hidden');
+            if ($(window).height() > $('body').height() || $(window).height() > $('.overlay').height())
                 $('.overlay').css('height', 'calc(100vh - ' + $('.header').height() + 'px)');
-            if ($(document).width() > 470)
+            //if ($(document).width() > 470)
                 $('main').attr('style', 'height: ' + $('.overlay').height() + 'px !important');
         }, 100);
     });
 
     $('.overlay__back').on('click', function() {    //"back" button click closes an overlay
         $('.overlay').toggleClass('overlay_hidden');
-        $('.header').toggleClass('header_hidden');
-        setTimeout(function() {
-            $('.overlay__carousel').slick('unslick');
-        }, 300);
+        $('.overlay__to-website').toggleClass('overlay__to-website_hidden');
         $('main').removeAttr('style');
+        $('.overlay').removeAttr('style');
     });
 
     var dropdownActiveFlag = 0; //a flag if some sort-by dropdown is opened
@@ -292,7 +296,7 @@ $(document).ready(function(){
     });
 
     $('.sort-by__wrapper:not(.sort-by__wrapper-mobile) .sort-by__title').on('click', function() {   //fires when desktop/tablet sort-by activation button clicked
-        if (!$(this).is($('.sort-by__title_active'))) {  //if this dropdown already opened -> close it
+        if (!$(this).is($('.sort-by__title_active')))  //if this dropdown already opened -> close it
             /*$(this).removeClass('sort-by__title_active');
             $(this).siblings('.sort-by__dropdown').addClass('sort-by__dropdown_inactive');
             setTimeout(function() {
@@ -300,33 +304,27 @@ $(document).ready(function(){
             }, 300);
             dropdownActiveFlag = 0;
         } else {   */ //this dropdown was closed -> open it
-            $('.sort-by__title_active').removeClass('sort-by__title_active');
-            var element = $('.sort-by__dropdown:not(.sort-by__dropdown_inactive)');
-            element.addClass('sort-by__dropdown_inactive');
-            element.attr('style', 'display: none !important');
-            $(this).addClass('sort-by__title_active');
-            $(this).siblings('.sort-by__dropdown').css('display', 'block');
-            $(this).siblings('.sort-by__dropdown').removeClass('sort-by__dropdown_inactive');
-            dropdownActiveFlag = 1;
-        }
-    });
-
-    $('.sort-by__wrapper:not(.sort-by__wrapper-mobile) .sort-by__item label').on('click', function() {  //function that enables/disebles buttons when first/last checkbox of filter menu clicked on mobile version
-        if ($(this).parent().parent().find('input:checked').length == 0) {  //fires when only one first checkbox turns checked
-            $(this).parent().parent().siblings('.sort-by__controls').children('.btn:nth-child(2)').removeClass('btn_inactive');
-            $(this).parent().parent().siblings('.sort-by__controls').children().removeAttr('disabled');
-        }
-        else if ($('.sort-by__item input:checked+label').is($(this)) && $(this).parent().parent().find('input:checked').length == 1) {  //fires when only one the last checkbox turns unchecked
-            $(this).parent().parent().siblings('.sort-by__controls').children('.btn:nth-child(2)').addClass('btn_inactive');
-            $(this).parent().parent().siblings('.sort-by__controls').children().attr('disabled', 'disabled');
-        }
-    });
-
-    $('.sort-by__wrapper:not(.sort-by__wrapper-mobile) button#clear-checkboxes').on('click', function() {   //clear all the checkboxes checked
-        $(this).parent().siblings('.sort-by__list').find('input:checked').prop('checked', false);
-        $(this).attr('disabled', 'disabled');
-        $(this).siblings('.btn').addClass('btn_inactive');
-        $(this).siblings('.btn').attr('disabled', 'disabled');
+            if (!mobile470Flag) {
+                $('.sort-by__title_active').removeClass('sort-by__title_active');
+                var element = $('.sort-by__dropdown:not(.sort-by__dropdown_inactive)');
+                element.addClass('sort-by__dropdown_inactive');
+                element.attr('style', 'display: none !important');
+                $(this).addClass('sort-by__title_active');
+                $(this).siblings('.sort-by__dropdown').css('display', 'block');
+                $(this).siblings('.sort-by__dropdown').removeClass('sort-by__dropdown_inactive');
+                dropdownActiveFlag = 1;
+                if (!$(this).val().length) {
+                    let list = $('#search-services');
+                    list.text("");
+                    fillTheSearchCathegory(list, '<li>', '</li>');
+                }
+            } else {
+                $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
+                if (mobileFlag) //set mobile filter menu height on width <= 1024
+                    $('.sort-by__mobile').css('height', window.innerHeight);
+                $('main').attr('style', 'height: ' + (window.innerHeight - $('.header').height() - 12) + 'px !important');
+                $('#my-search-m').focus();
+            }
     });
 
     $('.hamburger').on('click', function() {    //hamburger menu activation
@@ -360,36 +358,17 @@ $(document).ready(function(){
         $('.hamburger__dropdown-list').toggleClass('hamburger__dropdown-list_closed');
     });
 
-    $('.sort-by__wrapper-mobile .sort-by__title').on('click', function() {  //show filter menu on mobile version
+    /*$('.sort-by__title').on('click', function() {  //show filter menu on mobile version
         $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
-        $('.header').toggleClass('header_hidden');
+        $('main').attr('style', 'height: ' + $('.overlay').height() + 'px !important');
+        //$('.header').toggleClass('header_hidden');
         if (mobileFlag) //set mobile filter menu height on width <= 1024
-            $('.sort-by__mobile-main').css('height', window.innerHeight - 120);
-    });
+            $('.sort-by__mobile').css('height', window.innerHeight);
+    });*/
 
     $('.sort-by__mobile-header img').on('click', function() {   //hide filter menu on mobile version
         $('.sort-by__mobile').addClass('sort-by__mobile_inactive');
-        $('.header').toggleClass('header_hidden');
-    });
-
-    $('.sort-by__mobile .sort-by__item label').on('click', function() { //function that enables/disebles buttons when first/last checkbox of filter menu clicked on mobile version
-        if ($(this).parent().parent().parent().find('input:checked').length == 0) { //fires when only one first checkbox turns checked
-            $(this).parent().parent().parent().parent().siblings('.sort-by__mobile-footer').children('button').removeClass('btn_inactive');
-            $(this).parent().parent().parent().parent().siblings('.sort-by__mobile-footer').children('button').removeAttr('disabled');
-            $(this).parent().parent().parent().parent().siblings('.sort-by__mobile-header').children('button').removeAttr('disabled');
-        }
-        else if ($('.sort-by__mobile .sort-by__item input:checked+label').is($(this)) && $(this).parent().parent().parent().parent().find('input:checked').length == 1) {   //fires when only one the last checkbox turns unchecked
-            $(this).parent().parent().parent().parent().siblings('.sort-by__mobile-footer').children('button').addClass('btn_inactive');
-            $(this).parent().parent().parent().parent().siblings('.sort-by__mobile-footer').children('button').attr('disabled', 'disabled');
-            $(this).parent().parent().parent().parent().siblings('.sort-by__mobile-header').children('button').attr('disabled', 'disabled');
-        }
-    });
-
-    $('.sort-by__mobile button#clear-checkboxes-mobile').on('click', function() {   //clear all the checkboxes checked
-        $(this).parent().siblings('.sort-by__mobile-main').find('input:checked').prop('checked', false);
-        $(this).attr('disabled', 'disabled');
-        $(this).parent().siblings('.sort-by__mobile-footer').children('button').addClass('btn_inactive');
-        $(this).parent().siblings('.sort-by__mobile-footer').children('button').attr('disabled', 'disabled');
+        $('main').removeAttr('style');
     });
 
     $('.boutik__wrapper').on('beforeChange', function(e, slick, currentSlide, nextSlide) {  //change the pagination slide + markers on the map (desktop) + scroll to top when clicking the boutic__wrapper carousel controls
@@ -439,7 +418,7 @@ $(document).ready(function(){
         });
     if (mobileFlag) //dynamic mobile filter menu height resize on width <= 1024
         $(window).on('resize', function() {
-            $('.sort-by__mobile-main').css('height', window.innerHeight - 120);
+            $('.sort-by__mobile').css('height', window.innerHeight);
         });
 
     $('.general__fixed-popup-close').on('click', function() {   //hide the map popup
@@ -451,9 +430,8 @@ $(document).ready(function(){
 
     $('.general__fixed-filters').on('click', () => {    //show the filter mobile overlay when clicking on the map "filters" button 
         $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
-        $('.header').toggleClass('header_hidden');
         if (mobileFlag) //set mobile filter menu height on width <= 1024
-            $('.sort-by__mobile-main').css('height', window.innerHeight - 120);
+            $('.sort-by__mobile').css('height', window.innerHeight);
     });
 
 });
@@ -508,6 +486,7 @@ function initMap() {
                 this.setZIndex(1000);
                 markerOpened = this;
 
+                /*
                 //filling the popup with info start
                 var base = hairstylists[markerOpenedZ];
                 $('.general__fixed-popup img').attr('src', base.imagesGeneral[0]);
@@ -533,6 +512,7 @@ function initMap() {
                     if ($('.general__fixed-popup').height() + 6 > $('#map').height() - positionPX.y - 4)    //if bottom popup side falls out of map -> set the popup under the marker
                         $('.general__fixed-popup').css({'top': 'auto', 'bottom': $('#map').height() - positionPX.y + 28 + popupBottomDelta});
                 }   
+                */
             });
         }
 
@@ -547,7 +527,7 @@ function initMap() {
             setTimeout(function() {
                 $('.general__fixed-popup').css('display', 'none');
             }, 300);
-    });
+        });
 
         map.addListener("center_changed", () => {   //close the popup when map's scrolling
             if ($('.general__fixed-popup_hidden').length == 0) {
@@ -563,7 +543,7 @@ function initMap() {
                 markerOpened.setIcon('icons/marker.png');
                 markerOpened.setZIndex(markerOpenedZ);
             }
-            markerOpened = markers[$(this).data('id') - 1];
+            markerOpened = markers[$(this).data('idl')];
             markerOpenedZ = markerOpened.getZIndex();
             markerOpened.setIcon('icons/marker-a.png');
             markerOpened.setZIndex(1000);
@@ -589,56 +569,110 @@ function fromLatLngToPoint(latLng, map) {   //get the marker position in pixels 
     return new google.maps.Point((worldPoint.x - bottomLeft.x) * scale, (worldPoint.y - topRight.y) * scale);
 }
 
-function insert(str, index, value) {    //insertion
+function insert(str, index, value) {    //insert 'index' between 'value' and 'value+1' to str
     return str.substr(0, index) + value + str.substr(index);
 }
 
-$('#my-search').on('input', function() { //highlight the matchings when subsring entered to search field
-    let val = $(this).val().toLowerCase();
-    let searchItems = $('.sort-by__cathegory li');
-    if (val.length)        
-        for (let i = 0; i < searchItems.length; i++) {
-            let searchItemContent = searchItems[i].textContent,
-                searchItemContentLC = searchItemContent.toLowerCase();
-            searchItemContent.replace('<b>', '');
-            searchItemContent.replace('</b>', '');
-            let from = [];
-            let flag = 0;//from[0];
-            let pos = 0;
-            while (flag != -1) {
-                pos = searchItemContentLC.indexOf(val, pos);
-                from.push(pos);
-                flag = pos;
-                if (pos != -1)
-                    pos += val.length;
+function getServicesMatching(val, serv) {   //get all the services that have 'val' as a substring
+    var res = [];
+    for (let i = 0; i < serv.length; i++)
+        if (serv[i].toLowerCase().indexOf(val) != -1 && res.length <= 7)
+            res.push(serv[i]);
+    return res;
+}
+
+function fillTheSearchCathegory(list, openingTag, closingTag) { //fill in the search prompt with 7 first items
+    list.textContent = '';
+    for (let i = 0; i < services.length; i++)
+        if (i < 7)
+            list[0].insertAdjacentHTML('afterbegin', `${openingTag}${services[i]}${closingTag}`);
+}
+
+function getResultsProcessed(val, searchItems, openingTag, closingTag) {    //output the list items that matched to inputed to search fiels value wrapped to some tag
+    let res = "";
+    for (let i = 0; i < searchItems.length; i++) {
+        let searchItemContent = searchItems[i],
+            searchItemContentLC = searchItemContent.toLowerCase();
+        let from = [];
+        let flag = 0;
+        let pos = 0;
+        while (flag != -1) {
+            pos = searchItemContentLC.indexOf(val, pos);
+            from.push(pos);
+            flag = pos;
+            if (pos != -1)
+                pos += val.length;
+        }
+        let delta = 7;
+        let deltaFT = 3;
+        for (let j = 0; j < from.length; j++)
+            if (from[j] != -1) {
+                searchItemContent = insert(`${searchItemContent}`, from[j] + delta*j, `<b>`);
+                searchItemContent = insert(`${searchItemContent}`, from[j] + val.length + delta*j + deltaFT, `</b>`);
             }
-            let delta = 7;
-            let deltaFT = 3;
-            for (let j = 0; j < from.length; j++)
-                if (from[j] != -1) {
-                    searchItemContent = insert(`${searchItemContent}`, from[j] + delta*j, `<b>`);
-                    //console.log(from[j] + delta*j);
-                    searchItemContent = insert(`${searchItemContent}`, from[j] + val.length + delta*j + deltaFT, `</b>`);
-                    //console.log(from[j] + val.length + delta*j + deltaFT*(j+1));
-                }
-            from = [];
-            searchItems[i].textContent = '';
-            searchItems[i].insertAdjacentHTML('afterbegin', searchItemContent);
-        }
-    else
-        for (let i = 0; i < searchItems.length; i++) {
-            let searchItemContent = searchItems[i].textContent;
-            searchItemContent.replace('<b>', '');
-            searchItemContent.replace('</b>', '');
-            searchItems[i].textContent = '';
-            searchItems[i].insertAdjacentHTML('afterbegin', searchItemContent);
-        }
+        from = [];
+        res += `${openingTag}${searchItemContent}${closingTag}`;
+    }
+    return res;
+}
+
+$('input#my-search').on('input', function() {   //on desktop/tablet search input
+    openingTag = '<li>';
+    closingTag = '</li>';
+    let val = $(this).val().toLowerCase();
+    let searchItems = getServicesMatching(val, services);
+    let list = $('#search-services');
+    list.text("");
+    if (searchItems.length) //if there any services matching to value inputed
+        if (val.length >= 3)
+            list[0].insertAdjacentHTML('afterbegin', getResultsProcessed(val, searchItems, openingTag, closingTag));    //insert matching services
+        else
+            fillTheSearchCathegory(list, openingTag, closingTag);   //insert first 7 items
+    else    //if there're no items matching to search value |--| if 3 < search value length => show nothing-found text, if not => insert first 7 items
+        val.length >= 3 ? list[0].insertAdjacentHTML('afterbegin', `${openingTag}Sorry, nothing was found :(${closingTag}`) : fillTheSearchCathegory(list, openingTag, closingTag);
+});
+
+$('input#my-search-m').on('input', function() { //on mobile search input
+    openingTag = '<div class="sort-by__item">';
+    closingTag = '</div>';
+    let val = $(this).val().toLowerCase();
+    $('#my-search').val(val);
+    let searchItems = getServicesMatching(val, services);
+    let list = $('#m-search-services .sort-by__item-wrapper-mobile');
+    list.text("");
+    if (val.length) {   //if value inputed = void => hide popular search, show services & stylists
+        $('#m-search-popular-searches').css('display', 'none');
+        $('#m-search-services').css('display', 'block');
+        $('#m-search-stylists').css('display', 'block');
+        if (searchItems.length) //if there any services matching to value inputed
+            if (val.length >= 3) 
+                list[0].insertAdjacentHTML('afterbegin', getResultsProcessed(val, searchItems, openingTag, closingTag));    //insert matching services
+            else
+                fillTheSearchCathegory(list, openingTag, closingTag);   //insert first 7 items
+        else    //if there're no items matching to search value |--| if 3 < search value length => show nothing-found text, if not => insert first 7 items
+            val.length >= 3 ? list[0].insertAdjacentHTML('afterbegin', `${openingTag}Sorry, nothing was found :(${closingTag}`) : fillTheSearchCathegory(list, openingTag, closingTag);
+    } else {    //if value inputed != void => show popular search, hide services & stylists
+        $('#m-search-popular-searches').css('display', 'block');
+        $('#m-search-services').css('display', 'none');
+        $('#m-search-stylists').css('display', 'none');
+    }     
 });
 
 
 
 
-
+var services = [
+    'Lorem ipsum dolor sit amet',
+    'consectetur, adipisicing elit. Reiciendis',
+    'ducimus aliquam et minima unde',
+    'eos odio ex nisi vero amet',
+    'facere natus temporibus eius illo',
+    'a sapiente laborum, quos quidem!',
+    'Fugiat expedita blanditiis, voluptatumlor',
+    'esse aliquid, labore nostrum',
+    'obcaecati asperiores accusamus deleniti',
+    'minima reiciendis earumlor',
+]
 
 var itemsPerPage = 20;
 
@@ -12707,808 +12741,5 @@ var hairstylists = [
                 ]
             }
         ]
-    }
-];
-
-var hairstylistsOld = [
-    {
-        id: 1,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.5397923889708,
-            longitude: -73.61056752145646
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 2,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.506008,
-            longitude: -73.623882
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Foil Partial"
-    },{
-        id: 3,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.460540,
-            longitude: -73.702835
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 4,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.605319,
-            longitude: -73.549714
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 5,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.572644,
-            longitude: -73.519501
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 6,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.646617,
-            longitude: -73.501648
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 7,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.585140,
-            longitude: -73.642411
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 8,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.432600,
-            longitude: -73.603272
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 9,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.509162,
-            longitude: -73.682923
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 10,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.530812,
-            longitude: -73.548340
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 11,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.484616,
-            longitude: -73.552460
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 12,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.531293,
-            longitude: -73.630738
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 13,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.572644,
-            longitude: -73.631424
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 14,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.550049,
-            longitude: -73.590912
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 15,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.507237,
-            longitude: -73.839478
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 16,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.524558,
-            longitude: -73.717255
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 17,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.493280,
-            longitude: -73.748154
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 18,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.461503,
-            longitude: -73.886170
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 19,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.507060,
-            longitude: -73.866515
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 20,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.483957,
-            longitude: -73.699660
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 21,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.464216,
-            longitude: -73.552031
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 22,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.608986,
-            longitude: -73.552031
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 23,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.546987,
-            longitude: -73.539672
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 24,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.475291,
-            longitude: -73.585677
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
-    },{
-        id: 25,
-        avatar: "img/avatar/boutik-loremp-loremio.png",
-        businessName: "Boutik Loremp Loremio",
-        adress: {
-            street: "6990 rue st Hubert",
-            zip: "H2S 2M9",
-            city: "montreal",
-            state: "quebec",
-            country: "canada",
-            latitude: 45.517646,
-            longitude: -73.645415
-        },
-        website: "#",
-        categories: [
-            "Balayage",
-            "Air touch",
-            "Haircut"
-        ],
-        imagesGeneral: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut3.png"
-        ],
-        imagesOverlay: [
-            "img/haircuts/haircut1.png",
-            "img/haircuts/haircut2.png",
-            "img/haircuts/haircut4.png"
-        ],
-        description: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        textOverlay: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.<br><br>All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.<br><br>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-        subtitleOverlay: "Partial Foil"
     }
 ];

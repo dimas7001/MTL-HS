@@ -1,11 +1,10 @@
 .boutik
     position: relative
-    padding: 12px 0 49px 0
+    padding: 12px 0 49px 14px
     display: block
     flex-direction: row
     align-items: flex-start
     justify-content: flex-start
-    cursor: pointer
     box-sizing: border-box
     margin-left: 1px
     max-width: 648px
@@ -17,8 +16,7 @@
         height: 1px
         top: 0
         left: 15px
-        width: calc(50vw - 15px)
-        min-width: calc(100% - 15px)
+        width: calc(100% - 30px)
         max-width: 690px
     &::after
         position: absolute
@@ -28,8 +26,7 @@
         height: 1px
         bottom: -1px
         left: 0
-        width: 50vw
-        min-width: 100%
+        width: 100%
         max-width: 720px
     &__wrapper
         margin-top: 25px
@@ -43,7 +40,7 @@
                 &::after
                     display: none
         .slick-list
-            height: auto !important
+            //height: auto !important
     &__img
         display: flex
         flex-direction: row
@@ -69,6 +66,7 @@
         &_several-prices
             top: 5px
     &__price
+        width: 55px
         display: flex
         flex-direction: column
         align-items: flex-start
@@ -118,10 +116,13 @@
         margin: 2px 0 0
         color: $mainDark60
     &__service
+        height: auto !important
         position: relative
         overflow: visible !important
         padding-top: 46px
+        cursor: pointer
         &-wrapper
+            width: 100% !important
             .slick-custarr
                 opacity: 0
             &:hover
@@ -142,8 +143,8 @@
             bottom: auto
             top: 213px
             li
-                width: 12px
-                height: 12px
+                width: 13px
+                height: 13px
                 padding: 0
                 margin-right: 9px
                 &:last-child
@@ -153,14 +154,15 @@
                 button
                     position: relative
                     top: -4px
-                    width: 12px !important
-                    height: 12px !important
+                    width: 13px !important
+                    height: 13px !important
                     border-radius: 50%
                     border: 1px solid $mainDark80
                     box-sizing: border-box
                     margin: 0
                     padding: 0
                     transition: .2s all
+                    background-color: #fff
             .slick-active
                 transform: scale(1) !important
                 button
