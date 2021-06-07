@@ -56,11 +56,19 @@
         position: relative
         border-radius: 3px
         margin-bottom: 13px
-        img
+        div
             flex-shrink: 1
             flex-basis: 152px
-            border-radius: 3px
+            overflow: hidden
             margin-right: 13px
+            background-size: cover
+            background-position: center center
+            background-repeat: no-repeat
+            border-radius: 3px
+            &:after 
+                content: ""
+                display: block
+                padding-bottom: 100%
             &:last-child
                 margin-right: 0
     &__share
@@ -102,7 +110,7 @@
                 justify-content: flex-start
                 align-items: flex-start
                 &:nth-child(2)
-                    width: 55px
+                    min-width: 55px
             &-name
                 margin-bottom: 2px
         &-from
