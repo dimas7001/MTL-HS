@@ -34,7 +34,7 @@ gulp.task('watch', function() {
 });
 
 gulp.task('html', function() {
-    return gulp.src("src/index.html")   /*("src/*.html")*/
+    return gulp.src("src/category.html")   /*("src/*.html")*/
         //.pipe(rename("index.html")) /*didn't exist*/
         //.pipe(htmlmin({ collapseWhitespace: true }))    /*was commented*/
         .pipe(gulp.dest('dist'));

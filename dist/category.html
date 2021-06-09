@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Dmytro Baranov">
+    <title>MTL HS Cat</title>
+    <link rel="stylesheet" href="css/style.min.css">
+</head>
+<body onload="renderCategoryPage();">
+    <header class="header">
+        <div class="container">
+            <div class="header__wrapper">
+                <div class="hamburger"></div>
+                <img src="icons/logo.svg" class="header__logo" alt="logo">
+                <nav>
+                    <a href="#" class="header__city header__city_active">MONTREAL</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="overlay">
+            <div class="container-s">
+                <div class="overlay__gen-top-wrapper">
+                    <div class="overlay__back">
+                        <img src="icons/back.svg" alt="back">
+                        <span class="text-m">Back</span>
+                    </div>
+                    <div class="overlay__top-wrapper">
+                        <img src="" alt="avatar">
+                        <div class="overlay__titles">
+                            <div class="boutik__name text-l-sb"></div>
+                            <div class="boutik__location">
+                                <a href="#" class="text-s" tabindex="0"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="overlay__img">
+                </div>
+                <div class="overlay__text text-l"></div>
+                <div class="overlay__to-website">
+                    <a href="#" class="text-m-b">Website</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    <section class="hamburger__wrapper hamburger__wrapper_inactive">
+        <div class="hamburger__shadow"></div>
+        <div class="hamburger__menu">
+            <div class="hamburger__header">
+                <img src="icons/close.svg" class="hamburger__close" alt="close">
+                <img src="icons/logo.svg" class="hamburger__top-logo" alt="logo"></img>
+            </div>
+            <div class="hamburger__main">
+                <div class="hamburger__locations">
+                    <div class="hamburger__dropdown-title">
+                        <h2>Locations</h2>
+                        <img src="icons/carette-down.svg" alt="carette-down">
+                    </div>
+                    <ul class="hamburger__dropdown-list">
+                        <li class="active">MONTREAL</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="hamburger__footer">
+                <img src="icons/logo.svg" class="hamburger__bottom-logo" alt="logo">
+                <a href="#" class="text-l">Terms & Conditions</a>
+                <a href="#" class="text-l">Privacy Policy</a>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

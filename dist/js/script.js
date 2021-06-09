@@ -128,381 +128,385 @@ function getPrice(services, positions) {    //get price or price options blocks 
     return priceBlock;
 }
 
-$(document).ready(function(){
+function renderCategoryPage () {    //instrunctions for category page
+    var servicesPositions = localStorage.getItem('services');
+        if (servicesPositions.indexOf(',') != -1)
+            servicesPositions = servicesPositions.split(',');
+
+    let boutik = hairstylists[localStorage.getItem('idl')];
+
+    console.log(boutik);
     
-    if ($(document).width() <= 1024) {
-        mobileFlag = 1;
-        offsetDelta = 43;
-        popupBottomDelta = 22;
-    }
-    if ($(document).width() <= 470)
-        mobile470Flag = 1;
+    $('.overlay .overlay__top-wrapper>img').attr("src", boutik.avatar);
+    $('.overlay .boutik__name').text(boutik.businessName);
+    $('.overlay .boutik__location a').text(boutik.address.street);
+    $('.overlay__price-option').remove();
+    $('.overlay__price').remove();
+    $('.overlay__img').text("");
+    $('.overlay__img')[0].insertAdjacentHTML('afterbegin', getCategoryImg(boutik.categories[localStorage.getItem('category-num')], !mobile470Flag ? 4 : 2));
+    $('.overlay__img')[0].insertAdjacentHTML('afterend', getPrice(boutik.services, servicesPositions));
+    $('.overlay__text').text(boutik.bio);
+    $('.overlay__to-website a').attr("href", boutik.website);
+
+    $('.overlay__back').on('click', function() {    //"back" button click closes a category page
+        window.history.back();
+    });
+}
+
+function renderGeneralPage () { //instrunctions for general page
+    $(document).ready(function(){
         
-
-    var hairstylistsLen = hairstylists.length;
-    var pagesAmount = Math.trunc(hairstylistsLen / itemsPerPage) + 1;
-
-    $('.boutik__wrapper').text("");
-
-    for (var i = 0; i < hairstylistsLen; i++) { //parsing the items info
-
-        if (i == 0) {
-            var wrapper = document.createElement("div");
-            wrapper.dataset.page = 1;   //d
+        if ($(document).width() <= 1024) {
+            mobileFlag = 1;
+            offsetDelta = 43;
+            popupBottomDelta = 22;
         }
+        if ($(document).width() <= 470)
+            mobile470Flag = 1;
+            
 
-        onePagePositions.push({ lat: hairstylists[i].address.latitude, lng: hairstylists[i].address.longitude});  //get position
+        var hairstylistsLen = hairstylists.length;
+        var pagesAmount = Math.trunc(hairstylistsLen / itemsPerPage) + 1;
 
-        var categoryList = "";
-        var categoryListLen = hairstylists[i].categories.length;
-        for (var j = 0; j < categoryListLen; j++) {  //get the info of all categories
+        $('.boutik__wrapper').text("");
 
-            /*var priceBlock = "";
-            var severalPrices = "";
-            if (hairstylists[i].services[j].price.priceType == "From") { //fill in the service pricing info 
-                priceBlock = `
-                    <div class="boutik__price-from">From</div>
-                    <div>${hairstylists[i].services[j].price.specialPrice}</div>
-                `;
-                severalPrices = "boutik__info_several-prices";
-            } else if (hairstylists[i].services[j].price.specialPrice)
-                {
+        for (var i = 0; i < hairstylistsLen; i++) { //parsing the items info
+
+            if (i == 0) {
+                var wrapper = document.createElement("div");
+                wrapper.dataset.page = 1;   //d
+            }
+
+            onePagePositions.push({ lat: hairstylists[i].address.latitude, lng: hairstylists[i].address.longitude});  //get position
+
+            var categoryList = "";
+            var categoryListLen = hairstylists[i].categories.length;
+            for (var j = 0; j < categoryListLen; j++) {  //get the info of all categories
+
+                /*var priceBlock = "";
+                var severalPrices = "";
+                if (hairstylists[i].services[j].price.priceType == "From") { //fill in the service pricing info 
                     priceBlock = `
+                        <div class="boutik__price-from">From</div>
                         <div>${hairstylists[i].services[j].price.specialPrice}</div>
-                        <div class="boutik__price-old">${hairstylists[i].services[j].price.price}</div>
                     `;
                     severalPrices = "boutik__info_several-prices";
-                } else 
-                    priceBlock = `<div class="boutik__price-old">${hairstylists[i].services[j].price.price}</div>`;
-            
-            var hours = hairstylists[i].services[j].price.duration / 60 | 0;
-            var minutes = hairstylists[i].services[j].price.duration % 60;
-            if (hours && minutes)
-                var duration = `${hours}h ${minutes}min`;
-            else if (!hours && minutes)
-                    var duration = `${minutes}min`;
-                else
-                    var duration = `${hours}h`;                
-            */
+                } else if (hairstylists[i].services[j].price.specialPrice)
+                    {
+                        priceBlock = `
+                            <div>${hairstylists[i].services[j].price.specialPrice}</div>
+                            <div class="boutik__price-old">${hairstylists[i].services[j].price.price}</div>
+                        `;
+                        severalPrices = "boutik__info_several-prices";
+                    } else 
+                        priceBlock = `<div class="boutik__price-old">${hairstylists[i].services[j].price.price}</div>`;
+                
+                var hours = hairstylists[i].services[j].price.duration / 60 | 0;
+                var minutes = hairstylists[i].services[j].price.duration % 60;
+                if (hours && minutes)
+                    var duration = `${hours}h ${minutes}min`;
+                else if (!hours && minutes)
+                        var duration = `${minutes}min`;
+                    else
+                        var duration = `${hours}h`;                
+                */
 
-            let catName = hairstylists[i].categories[j].name.toLowerCase();
-            let amountAvailable = 0;
-            let firstServiceFlag = 1;
-            let firstService;
-            let servicesPositions = [];
-            for (let k = 0; k < hairstylists[i].services.length; k++)
-                if (catName == hairstylists[i].services[k].category.toLowerCase())
-                    if (firstServiceFlag) {
-                        firstService = hairstylists[i].services[k];
-                        firstServiceFlag = 0;
-                        amountAvailable++;
-                        servicesPositions.push(k);
-                    } else {
-                        amountAvailable++;
-                        servicesPositions.push(k);
-                    }
+                let catName = hairstylists[i].categories[j].name.toLowerCase();
+                let amountAvailable = 0;
+                let firstServiceFlag = 1;
+                let firstService;
+                let servicesPositions = [];
+                for (let k = 0; k < hairstylists[i].services.length; k++)
+                    if (catName == hairstylists[i].services[k].category.toLowerCase())
+                        if (firstServiceFlag) {
+                            firstService = hairstylists[i].services[k];
+                            firstServiceFlag = 0;
+                            amountAvailable++;
+                            servicesPositions.push(k);
+                        } else {
+                            amountAvailable++;
+                            servicesPositions.push(k);
+                        }
 
-            categoryList += `
-                <div class="boutik__service"
-                    data-category="${hairstylists[i].categories[j].name}"
-                    data-category-num="${j}"
-                    data-services="${servicesPositions.join()}"
-                >
-                    <div class="boutik__img">
-                        ${getCategoryImg(hairstylists[i].categories[j], 4)}
-                    </div>
-                    <div class="boutik__info-label-wrapper text-m" style="margin-top: ${categoryListLen > 1 ? !mobile470Flag ? `54px` : `46px` : !mobile470Flag ? `22px` : `16px`}">
-                        <div class="boutik__info-label">
-                            <div class="boutik__info-label-name">${firstService.name}</div>
-                            <div class="boutik__info-label-duration">${parseTime(firstService.price.duration)}</div>
-                            <div class="boutik__info-label-price">${firstService.price.price}</div>
+                categoryList += `
+                    <div class="boutik__service"
+                        data-category="${hairstylists[i].categories[j].name}"
+                        data-category-num="${j}"
+                        data-services="${servicesPositions.join()}"
+                    >
+                        <div class="boutik__img">
+                            ${getCategoryImg(hairstylists[i].categories[j], 4)}
                         </div>
-                        ${(amountAvailable > 1) ? `<div class="boutik__info-label">${amountAvailable} services available</div>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-        
-
-
-        //inserting the item + filling it with prepared info and info get from array
-        wrapper.insertAdjacentHTML("beforeend", `
-            <div class="boutik"
-                data-idl="${i}"
-            >
-                <div class="overlay__top-wrapper">
-                    <img src="${hairstylists[i].avatar}" alt="avatar">
-                    <div class="overlay__titles">
-                        <h3 class="boutik__name">${hairstylists[i].businessName}</h3>
-                        <div class="boutik__location">
-                            <a href="#" class="text-s">${hairstylists[i].address.street}</a>
+                        <div class="boutik__info-label-wrapper text-m" style="margin-top: ${categoryListLen > 1 ? !mobile470Flag ? `54px` : `46px` : !mobile470Flag ? `22px` : `16px`}">
+                            <div class="boutik__info-label">
+                                <div class="boutik__info-label-name">${firstService.name}</div>
+                                <div class="boutik__info-label-duration">${parseTime(firstService.price.duration)}</div>
+                                <div class="boutik__info-label-price">${firstService.price.price}</div>
+                            </div>
+                            ${(amountAvailable > 1) ? `<div class="boutik__info-label">${amountAvailable} services available</div>` : ''}
                         </div>
                     </div>
-                </div>
-                <div class="boutik__service-wrapper">
-                    ${categoryList}
-                </div>
-            </div>
-        `);
-
-        if (i != 0 && ((i + 1) % itemsPerPage == 0 || i + 1 == hairstylistsLen)) {  //insert the page when the page items limit hit or items array is ended
-            $('.boutik__wrapper')[0].insertAdjacentElement('beforeend', wrapper);
-            var wrapper = document.createElement("div");
-            positions.push(onePagePositions);   //filling up the position arr for later use with markers setting
-            onePagePositions = [];
-        }
-    }
-
-
-    $('.boutik__service-wrapper').slick({   //service carousel for each boutik item
-        speed: 300,
-        infinite: true,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: false,
-        variableWidth: false,
-        adaptiveHeight: true,
-        swipeToSlide: false,
-        swipe: false,
-        prevArrow: '<button type="button" class="slick-prev slick-custarr slick-custarr-mini"></button>',
-        nextArrow: '<button type="button" class="slick-next slick-custarr slick-custarr-mini"></button>',
-        arrows: true,
-        dots: true,
-        responsive: [{
-            breakpoint: 768,
-            settings: {
-                swipe: true
+                `;
             }
-        }]
-    });
+            
 
-    if (pagesAmount > 1) {
-        var paginationContent = "";
-        for (var i = 0; i < pagesAmount; i++)   //filling the pagination with proper pages amount
-            paginationContent += `<div class="pagination__page">${i+1}</div>`;
-        $('.pagination')[0].insertAdjacentHTML('beforeend', paginationContent);
 
-        $('.pagination').slick({ //pagination
+            //inserting the item + filling it with prepared info and info get from array
+            wrapper.insertAdjacentHTML("beforeend", `
+                <div class="boutik"
+                    data-idl="${i}"
+                >
+                    <div class="overlay__top-wrapper">
+                        <img src="${hairstylists[i].avatar}" alt="avatar">
+                        <div class="overlay__titles">
+                            <h3 class="boutik__name">${hairstylists[i].businessName}</h3>
+                            <div class="boutik__location">
+                                <a href="#" class="text-s">${hairstylists[i].address.street}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="boutik__service-wrapper">
+                        ${categoryList}
+                    </div>
+                </div>
+            `);
+
+            if (i != 0 && ((i + 1) % itemsPerPage == 0 || i + 1 == hairstylistsLen)) {  //insert the page when the page items limit hit or items array is ended
+                $('.boutik__wrapper')[0].insertAdjacentElement('beforeend', wrapper);
+                var wrapper = document.createElement("div");
+                positions.push(onePagePositions);   //filling up the position arr for later use with markers setting
+                onePagePositions = [];
+            }
+        }
+
+
+        $('.boutik__service-wrapper').slick({   //service carousel for each boutik item
             speed: 300,
-            infinite: false,
-            slidesToShow: 3,
+            infinite: true,
+            slidesToShow: 1,
             slidesToScroll: 1,
-            centerMode: true,
+            centerMode: false,
             variableWidth: false,
             adaptiveHeight: true,
             swipeToSlide: false,
-            arrows: false,
-            swipe: false
+            swipe: false,
+            prevArrow: '<button type="button" class="slick-prev slick-custarr slick-custarr-mini"></button>',
+            nextArrow: '<button type="button" class="slick-next slick-custarr slick-custarr-mini"></button>',
+            arrows: true,
+            dots: true,
+            responsive: [{
+                breakpoint: 768,
+                settings: {
+                    swipe: true
+                }
+            }]
         });
-    }
 
-    $('.boutik__wrapper').slick({ //global boutik items carousel
-        speed: 300,
-        infinite: true,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: false,
-        variableWidth: false,
-        adaptiveHeight: true,
-        swipeToSlide: true,
-        prevArrow: '<button type="button" class="slick-prev slick-custarr slick-custarr-general"><img src="icons/arrow_left.svg" alt="prev"></button>',
-        nextArrow: '<button type="button" class="slick-next slick-custarr slick-custarr-general"><img src="icons/arrow_right.svg" alt="next"></button>',
-        arrows: true,
-        swipe: false,
-        mobileFirst: false
-    });
+        if (pagesAmount > 1) {
+            var paginationContent = "";
+            for (var i = 0; i < pagesAmount; i++)   //filling the pagination with proper pages amount
+                paginationContent += `<div class="pagination__page">${i+1}</div>`;
+            $('.pagination')[0].insertAdjacentHTML('beforeend', paginationContent);
 
-    $('.boutik__service').on('click', function() { //read an info from boutik dataset, parse it to an overlay and show the overlay
-        var boutik = hairstylists[$(this).parents('.boutik').data('idl')];
-        var servicesPositions = $(this).data('services').toString();
-        if (servicesPositions.indexOf(',') != -1)
-            servicesPositions = servicesPositions.split(',');
-        //var service = boutik.services[$(this).data('order')];
-        $('.overlay .overlay__top-wrapper>img').attr("src", boutik.avatar);
-        $('.overlay .boutik__name').text(boutik.businessName);
-        $('.overlay .boutik__location a').text(hairstylists[i].address.street);
-        $('.overlay__price-option').remove();
-        $('.overlay__price').remove();
-        $('.overlay__img').text("");
-        $('.overlay__img')[0].insertAdjacentHTML('afterbegin', getCategoryImg(boutik.categories[$(this).data('category-num')], !mobile470Flag ? 4 : 2));
-        $('.overlay__img')[0].insertAdjacentHTML('afterend', getPrice(boutik.services, servicesPositions));
-        $('.overlay__text').text(boutik.bio);
-        $('.overlay__to-website a').attr("href", boutik.website);
-        setTimeout(function() {
-            $('.overlay').toggleClass('overlay_hidden');
-            $('.overlay__to-website').toggleClass('overlay__to-website_hidden');
-            if ($(window).height() > $('body').height() || $(window).height() > $('.overlay').height())
-                $('.overlay').css('height', 'calc(100vh - ' + $('.header').height() + 'px)');
-            //if ($(document).width() > 470)
-                $('main').attr('style', 'height: ' + $('.overlay').height() + 'px !important');
-        }, 100);
-    });
+            $('.pagination').slick({ //pagination
+                speed: 300,
+                infinite: false,
+                slidesToShow: 3,
+                slidesToScroll: 1,
+                centerMode: true,
+                variableWidth: false,
+                adaptiveHeight: true,
+                swipeToSlide: false,
+                arrows: false,
+                swipe: false
+            });
+        }
 
-    $('.overlay__back').on('click', function() {    //"back" button click closes an overlay
-        $('.overlay').toggleClass('overlay_hidden');
-        $('.overlay__to-website').toggleClass('overlay__to-website_hidden');
-        $('main').removeAttr('style');
-        $('.overlay').removeAttr('style');
-    });
+        $('.boutik__wrapper').slick({ //global boutik items carousel
+            speed: 300,
+            infinite: true,
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            centerMode: false,
+            variableWidth: false,
+            adaptiveHeight: true,
+            swipeToSlide: true,
+            prevArrow: '<button type="button" class="slick-prev slick-custarr slick-custarr-general"><img src="icons/arrow_left.svg" alt="prev"></button>',
+            nextArrow: '<button type="button" class="slick-next slick-custarr slick-custarr-general"><img src="icons/arrow_right.svg" alt="next"></button>',
+            arrows: true,
+            swipe: false,
+            mobileFirst: false
+        });
 
-    var dropdownActiveFlag = 0; //a flag if some sort-by dropdown is opened
+        $('.boutik__service').on('click', function() { //read an info from boutik dataset, parse it to an overlay and show the overlay
+            localStorage.clear();
+            
+            localStorage.setItem('idl', $(this).parents('.boutik').data('idl'));
+            localStorage.setItem('category-num', $(this).data('category-num'));
+            localStorage.setItem('services', $(this).data('services').toString());
 
-    $(document).on('click', function(e) {   //close a dropdown opened when clickig outside of it and other dropdowns 
-        if ($('.sort-by__dropdown:not(.sort-by__dropdown_inactive)').length == 1)
-            if (!$(e.target).is($('.sort-by__title'))
-            && !$(e.target).is($('.sort-by__dropdown')) 
-            && !$('.sort-by__dropdown:not(.sort-by__dropdown_inactive)')[0].contains(e.target)
-            && $('.sort-by__title_active').length == 1
-            ) {
-                $('.sort-by__title_active').removeClass('sort-by__title_active');
-                var elem = $('.sort-by__dropdown');
-                elem.addClass('sort-by__dropdown_inactive');
+            location.href = '../category.html';
+        });
+
+        var dropdownActiveFlag = 0; //a flag if some sort-by dropdown is opened
+
+        $(document).on('click', function(e) {   //close a dropdown opened when clickig outside of it and other dropdowns 
+            if ($('.sort-by__dropdown:not(.sort-by__dropdown_inactive)').length == 1)
+                if (!$(e.target).is($('.sort-by__title'))
+                && !$(e.target).is($('.sort-by__dropdown')) 
+                && !$('.sort-by__dropdown:not(.sort-by__dropdown_inactive)')[0].contains(e.target)
+                && $('.sort-by__title_active').length == 1
+                ) {
+                    $('.sort-by__title_active').removeClass('sort-by__title_active');
+                    var elem = $('.sort-by__dropdown');
+                    elem.addClass('sort-by__dropdown_inactive');
+                    setTimeout(function() {
+                        elem.attr('style', 'display: none !important');
+                    }, 300);
+                    dropdownActiveFlag = 0;
+                }
+        });
+
+        $('.sort-by__wrapper:not(.sort-by__wrapper-mobile) .sort-by__title').on('click', function() {   //fires when desktop/tablet sort-by activation button clicked
+            if (!$(this).is($('.sort-by__title_active')))  //if this dropdown already opened -> close it
+                /*$(this).removeClass('sort-by__title_active');
+                $(this).siblings('.sort-by__dropdown').addClass('sort-by__dropdown_inactive');
                 setTimeout(function() {
-                    elem.attr('style', 'display: none !important');
+                    $(this).siblings('.sort-by__dropdown').attr('style', 'display: none !important');
                 }, 300);
                 dropdownActiveFlag = 0;
-            }
-    });
-
-    $('.sort-by__wrapper:not(.sort-by__wrapper-mobile) .sort-by__title').on('click', function() {   //fires when desktop/tablet sort-by activation button clicked
-        if (!$(this).is($('.sort-by__title_active')))  //if this dropdown already opened -> close it
-            /*$(this).removeClass('sort-by__title_active');
-            $(this).siblings('.sort-by__dropdown').addClass('sort-by__dropdown_inactive');
-            setTimeout(function() {
-                $(this).siblings('.sort-by__dropdown').attr('style', 'display: none !important');
-            }, 300);
-            dropdownActiveFlag = 0;
-        } else {   */ //this dropdown was closed -> open it
-            if (!mobile470Flag) {
-                $('.sort-by__title_active').removeClass('sort-by__title_active');
-                var element = $('.sort-by__dropdown:not(.sort-by__dropdown_inactive)');
-                element.addClass('sort-by__dropdown_inactive');
-                element.attr('style', 'display: none !important');
-                $(this).addClass('sort-by__title_active');
-                $(this).siblings('.sort-by__dropdown').css('display', 'block');
-                $(this).siblings('.sort-by__dropdown').removeClass('sort-by__dropdown_inactive');
-                dropdownActiveFlag = 1;
-                if (!$(this).val().length) {
-                    let list = $('#search-services');
-                    list.text("");
-                    fillTheSearchCathegory(list, '<li>', '</li>');
+            } else {   */ //this dropdown was closed -> open it
+                if (!mobile470Flag) {
+                    $('.sort-by__title_active').removeClass('sort-by__title_active');
+                    var element = $('.sort-by__dropdown:not(.sort-by__dropdown_inactive)');
+                    element.addClass('sort-by__dropdown_inactive');
+                    element.attr('style', 'display: none !important');
+                    $(this).addClass('sort-by__title_active');
+                    $(this).siblings('.sort-by__dropdown').css('display', 'block');
+                    $(this).siblings('.sort-by__dropdown').removeClass('sort-by__dropdown_inactive');
+                    dropdownActiveFlag = 1;
+                    if (!$(this).val().length) {
+                        let list = $('#search-services');
+                        list.text("");
+                        fillTheSearchCathegory(list, '<li>', '</li>');
+                    }
+                } else {
+                    $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
+                    if (mobileFlag) //set mobile filter menu height on width <= 1024
+                        $('.sort-by__mobile').css('height', window.innerHeight);
+                    $('main').attr('style', 'height: ' + (window.innerHeight - $('.header').height() - 12) + 'px !important');
+                    $('#my-search-m').focus();
                 }
-            } else {
-                $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
-                if (mobileFlag) //set mobile filter menu height on width <= 1024
-                    $('.sort-by__mobile').css('height', window.innerHeight);
-                $('main').attr('style', 'height: ' + (window.innerHeight - $('.header').height() - 12) + 'px !important');
-                $('#my-search-m').focus();
+        });
+
+        $('.boutik__wrapper').on('beforeChange', function(e, slick, currentSlide, nextSlide) {  //change the pagination slide + markers on the map (desktop) + scroll to top when clicking the boutic__wrapper carousel controls
+            if ($(e.target).is($('.boutik__wrapper'))) {
+                $('.pagination').slick('slickGoTo', nextSlide);
+                $('html, body').animate({scrollTop: $('.boutik__wrapper').offset().top - 32}, 350);
+                if (!mobileFlag) {
+                    for (var i = currentSlide * itemsPerPage; i < ((markers.length - currentSlide * itemsPerPage >= itemsPerPage) ? ((currentSlide + 1) * itemsPerPage) : markers.length); i++)
+                        markers[i].setMap(null);
+                    for (var i = nextSlide * itemsPerPage; i < ((markers.length - nextSlide * itemsPerPage >= itemsPerPage) ? ((nextSlide + 1) * itemsPerPage) : markers.length); i++)
+                        markers[i].setMap(map);
+                }
             }
-    });
-
-    $('.hamburger').on('click', function() {    //hamburger menu activation
-        $('.hamburger__wrapper_inactive').removeClass('hamburger__wrapper_inactive');
-        $('.header').toggleClass('header_hidden');
-    });
-
-    $('.hamburger__close').on('click', function() { //hamburger menu hiding when close button clicked
-        $('.hamburger__wrapper').addClass('hamburger__wrapper_inactive');
-        $('.header').toggleClass('header_hidden');
-    });
-
-    $('.hamburger__shadow').on('click', function() {    //hamburger menu hiding when shadow clicked
-        $('.hamburger__wrapper').addClass('hamburger__wrapper_inactive');
-        $('.header').toggleClass('header_hidden');
-    });
-
-    $('.hamburger__dropdown-title').on('click', function() {    //open/close a hamburger menu dropdown
-        if ($('.hamburger__dropdown-list_closed').length == 0) {
-            $(this).children('img').addClass('carette-up-anim');
-            setTimeout(function() {
-                $('.hamburger__dropdown-title img').removeClass('carette-up-anim');
-            }, 300);
-        } else {
-            $(this).children('img').addClass('carette-down-anim');
-            setTimeout(function() {
-                $('.hamburger__dropdown-title img').removeClass('carette-down-anim');
-            }, 300);
-        }
+        });
         
-        $('.hamburger__dropdown-list').toggleClass('hamburger__dropdown-list_closed');
-    });
-
-    /*$('.sort-by__title').on('click', function() {  //show filter menu on mobile version
-        $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
-        $('main').attr('style', 'height: ' + $('.overlay').height() + 'px !important');
-        //$('.header').toggleClass('header_hidden');
-        if (mobileFlag) //set mobile filter menu height on width <= 1024
-            $('.sort-by__mobile').css('height', window.innerHeight);
-    });*/
-
-    $('.sort-by__mobile-header img').on('click', function() {   //hide filter menu on mobile version
-        $('.sort-by__mobile').addClass('sort-by__mobile_inactive');
-        $('main').removeAttr('style');
-    });
-
-    $('.boutik__wrapper').on('beforeChange', function(e, slick, currentSlide, nextSlide) {  //change the pagination slide + markers on the map (desktop) + scroll to top when clicking the boutic__wrapper carousel controls
-        if ($(e.target).is($('.boutik__wrapper'))) {
-            $('.pagination').slick('slickGoTo', nextSlide);
-            $('html, body').animate({scrollTop: $('.boutik__wrapper').offset().top - 32}, 350);
-            if (!mobileFlag) {
-                for (var i = currentSlide * itemsPerPage; i < ((markers.length - currentSlide * itemsPerPage >= itemsPerPage) ? ((currentSlide + 1) * itemsPerPage) : markers.length); i++)
-                    markers[i].setMap(null);
-                for (var i = nextSlide * itemsPerPage; i < ((markers.length - nextSlide * itemsPerPage >= itemsPerPage) ? ((nextSlide + 1) * itemsPerPage) : markers.length); i++)
-                    markers[i].setMap(map);
+        $('.general__fixed-close, .toggle__map').on('click', function(e) {   //show/hide the map
+            $('body').attr('style', function(index, attr) {
+                return attr == 'overflow: hidden;' ? 'overflow: visible;' : 'overflow: hidden;';
+            });
+            $('.general__fixed').toggleClass('general__fixed_inactive');
+            $('.general__fixed-popup').addClass('general__fixed-popup_hidden'); //close the popup
+            setTimeout(function() {
+                $('.general__fixed-popup').css('display', 'none');
+            }, 300);
+            if (markerOpened) { //close marker opened
+                markerOpened.setIcon('icons/marker.png');
+                markerOpened.setZIndex(markerOpenedZ);
+                markerOpened = 0;
+                markerOpenedZ = 0;
             }
-        }
+            if ($(e.target).is($('.toggle__map'))) {
+                $('html, body').animate({scrollTop: 0}, 150); 
+                if (mobileFlag && !mobile470Flag)   //set map height on 470 < width <= 1024
+                    $('.general__fixed #map').css('height', window.innerHeight - 90);
+                if (mobileFlag && mobile470Flag)    //set map height on width <= 470
+                    $('.general__fixed #map').css('height', window.innerHeight - 61);
+            }
+        });
+
+        if (mobileFlag && !mobile470Flag)   //dynamic map height resize on 470 < width <= 1024
+            $(window).on('resize', function() {
+                $('.general__fixed #map').animate({height: window.innerHeight - 90}, 100);
+            });
+        if (mobileFlag && mobile470Flag)    //dynamic map height resize on width <= 470
+            $(window).on('resize', function() {
+                $('.general__fixed #map').animate({height: window.innerHeight - 61}, 100);
+            });
+        if (mobileFlag) //dynamic mobile filter menu height resize on width <= 1024
+            $(window).on('resize', function() {
+                $('.sort-by__mobile').css('height', window.innerHeight);
+            });
+
+        $('.general__fixed-popup-close').on('click', function() {   //hide the map popup
+            $('.general__fixed-popup').addClass('general__fixed-popup_hidden');
+            setTimeout(function() {
+                $('.general__fixed-popup').css('display', 'none');
+            }, 300);
+        });
+
+        $('.general__fixed-filters').on('click', () => {    //show the filter mobile overlay when clicking on the map "filters" button 
+            $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
+            if (mobileFlag) //set mobile filter menu height on width <= 1024
+                $('.sort-by__mobile').css('height', window.innerHeight);
+        });
+
     });
+}
+
+$('.hamburger').on('click', function() {    //hamburger menu activation
+    $('.hamburger__wrapper_inactive').removeClass('hamburger__wrapper_inactive');
+    $('.header').toggleClass('header_hidden');
+});
+
+$('.hamburger__close').on('click', function() { //hamburger menu hiding when close button clicked
+    $('.hamburger__wrapper').addClass('hamburger__wrapper_inactive');
+    $('.header').toggleClass('header_hidden');
+});
+
+$('.hamburger__shadow').on('click', function() {    //hamburger menu hiding when shadow clicked
+    $('.hamburger__wrapper').addClass('hamburger__wrapper_inactive');
+    $('.header').toggleClass('header_hidden');
+});
+
+$('.hamburger__dropdown-title').on('click', function() {    //open/close a hamburger menu dropdown
+    if ($('.hamburger__dropdown-list_closed').length == 0) {
+        $(this).children('img').addClass('carette-up-anim');
+        setTimeout(function() {
+            $('.hamburger__dropdown-title img').removeClass('carette-up-anim');
+        }, 300);
+    } else {
+        $(this).children('img').addClass('carette-down-anim');
+        setTimeout(function() {
+            $('.hamburger__dropdown-title img').removeClass('carette-down-anim');
+        }, 300);
+    }
     
-    $('.general__fixed-close, .toggle__map').on('click', function(e) {   //show/hide the map
-        $('body').attr('style', function(index, attr) {
-            return attr == 'overflow: hidden;' ? 'overflow: visible;' : 'overflow: hidden;';
-        });
-        $('.general__fixed').toggleClass('general__fixed_inactive');
-        $('.general__fixed-popup').addClass('general__fixed-popup_hidden'); //close the popup
-        setTimeout(function() {
-            $('.general__fixed-popup').css('display', 'none');
-        }, 300);
-        if (markerOpened) { //close marker opened
-            markerOpened.setIcon('icons/marker.png');
-            markerOpened.setZIndex(markerOpenedZ);
-            markerOpened = 0;
-            markerOpenedZ = 0;
-        }
-        if ($(e.target).is($('.toggle__map'))) {
-            $('html, body').animate({scrollTop: 0}, 150); 
-            if (mobileFlag && !mobile470Flag)   //set map height on 470 < width <= 1024
-                $('.general__fixed #map').css('height', window.innerHeight - 90);
-            if (mobileFlag && mobile470Flag)    //set map height on width <= 470
-                $('.general__fixed #map').css('height', window.innerHeight - 61);
-        }
-    });
+    $('.hamburger__dropdown-list').toggleClass('hamburger__dropdown-list_closed');
+});
 
-    if (mobileFlag && !mobile470Flag)   //dynamic map height resize on 470 < width <= 1024
-        $(window).on('resize', function() {
-            $('.general__fixed #map').animate({height: window.innerHeight - 90}, 100);
-        });
-    if (mobileFlag && mobile470Flag)    //dynamic map height resize on width <= 470
-        $(window).on('resize', function() {
-            $('.general__fixed #map').animate({height: window.innerHeight - 61}, 100);
-        });
-    if (mobileFlag) //dynamic mobile filter menu height resize on width <= 1024
-        $(window).on('resize', function() {
-            $('.sort-by__mobile').css('height', window.innerHeight);
-        });
+/*$('.sort-by__title').on('click', function() {  //show filter menu on mobile version
+    $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
+    $('main').attr('style', 'height: ' + $('.overlay').height() + 'px !important');
+    //$('.header').toggleClass('header_hidden');
+    if (mobileFlag) //set mobile filter menu height on width <= 1024
+        $('.sort-by__mobile').css('height', window.innerHeight);
+});*/
 
-    $('.general__fixed-popup-close').on('click', function() {   //hide the map popup
-        $('.general__fixed-popup').addClass('general__fixed-popup_hidden');
-        setTimeout(function() {
-            $('.general__fixed-popup').css('display', 'none');
-        }, 300);
-    });
-
-    $('.general__fixed-filters').on('click', () => {    //show the filter mobile overlay when clicking on the map "filters" button 
-        $('.sort-by__mobile_inactive').removeClass('sort-by__mobile_inactive');
-        if (mobileFlag) //set mobile filter menu height on width <= 1024
-            $('.sort-by__mobile').css('height', window.innerHeight);
-    });
-
+$('.sort-by__mobile-header img').on('click', function() {   //hide filter menu on mobile version
+    $('.sort-by__mobile').addClass('sort-by__mobile_inactive');
+    $('main').removeAttr('style');
 });
 
 var map;
@@ -1477,7 +1481,7 @@ var hairstylists = [
                 "price": {
                     "duration": 100,
                     "priceType": "From",
-                    "specialPrice": "$95.99"
+                    "price": "$95.99"
                 }
             }
         ]
